@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: backend
+
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3306/iaemprender?useSSL=false&allowPublicKeyRetrieval=true}
+    username: ${DB_USER:iaemprender}
+    password: ${DB_PASSWORD:iaemprender}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: "3"
+
+app:
+  seguridad:
+    jwt-secret: ${JWT_SECRET:cambia-este-valor-en-produccion-por-uno-largo-y-aleatorio-1234567890}
+    jwt-expiracion-minutos: ${JWT_EXPIRACION_MINUTOS:60}
+  cifrado:
+    clave-secreta: ${API_KEY_CIFRADO_SECRETO:cambia-esto-tambien-32-bytes-min}
+  proveedores-ia:
+    openai:
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+    gemini:
+      base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
+  ia-gateway:
+    base-url: ${IA_GATEWAY_BASE_URL:http://localhost:8000}
+
+logging:
+  level:
+    org.hibernate.SQL: debug

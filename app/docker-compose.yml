@@ -1,0 +1,71 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: iaemprender-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: iaemprender
+      MYSQL_USER: iaemprender
+      MYSQL_PASSWORD: iaemprender
+    command: --log-bin-trust-function-creators=1
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/1-schema.sql
+      - ./database/seed.sql:/docker-entrypoint-initdb.d/2-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -uroot -prootpass -N -e 'SELECT COUNT(*) FROM iaemprender.evaluaciones' | grep -q '^[1-9]'"]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+      start_period: 10s
+
+  adminer:
+    image: adminer:latest
+    container_name: iaemprender-adminer
+    restart: unless-stopped
+    ports:
+      - "8081:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  ia-gateway:
+    build: ./ia-gateway
+    container_name: iaemprender-ia-gateway
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    container_name: iaemprender-backend
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/iaemprender?useSSL=false&allowPublicKeyRetrieval=true
+      DB_USER: iaemprender
+      DB_PASSWORD: iaemprender
+      IA_GATEWAY_BASE_URL: http://ia-gateway:8000
+      APP_CORS_ORIGENES_PERMITIDOS: http://localhost:5173
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      ia-gateway:
+        condition: service_started
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:8080/api
+    container_name: iaemprender-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
