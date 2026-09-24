@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/resultados")
 public class ResultadoSemanalController {
-
   private final ResultadoSemanalService resultadoSemanalService;
 
   public ResultadoSemanalController(ResultadoSemanalService resultadoSemanalService) {

@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PlanServiceImpl implements PlanService {
-
   private static final Map<TiempoDisponible, SugerenciaCadencia> SUGERENCIAS = Map.of(
       TiempoDisponible.POCO, new SugerenciaCadencia(2, 2, "19:00–20:00"),
       TiempoDisponible.MEDIO, new SugerenciaCadencia(3, 4, "18:00–20:00"),

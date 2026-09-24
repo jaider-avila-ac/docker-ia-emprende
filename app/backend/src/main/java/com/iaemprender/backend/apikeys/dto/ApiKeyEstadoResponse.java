@@ -12,7 +12,6 @@ public record ApiKeyEstadoResponse(
     long tokensUsadosPeriodo,
     LocalDate periodoInicio,
     LocalDateTime ultimaVerificacion) {
-
   public static ApiKeyEstadoResponse desde(UsuarioApiKey k) {
     return new ApiKeyEstadoResponse(
         k.getProveedor().getCodigo(),

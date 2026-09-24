@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ApiKeyServiceImpl implements ApiKeyService {
-
   private final UsuarioApiKeyRepository usuarioApiKeyRepository;
   private final ProveedorIARepository proveedorIARepository;
   private final CifradoService cifradoService;

@@ -23,7 +23,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
   @Value("${app.cors.origenes-permitidos:http://localhost:5173}")
   private String origenesPermitidos;
 

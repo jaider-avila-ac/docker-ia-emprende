@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class RubroConverter implements AttributeConverter<Rubro, String> {
-
   @Override
   public String convertToDatabaseColumn(Rubro attribute) {
     return attribute == null ? null : attribute.getValorDb();

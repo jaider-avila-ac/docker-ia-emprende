@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class CompetidorServiceImpl implements CompetidorService {
-
   private final CompetidorRepository competidorRepository;
   private final NegocioService negocioService;
 

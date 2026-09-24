@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/competidores")
 public class CompetidorController {
-
   private final CompetidorService competidorService;
 
   public CompetidorController(CompetidorService competidorService) {

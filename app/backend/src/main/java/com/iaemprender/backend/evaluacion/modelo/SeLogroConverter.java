@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class SeLogroConverter implements AttributeConverter<SeLogro, String> {
-
   @Override
   public String convertToDatabaseColumn(SeLogro attribute) {
     return attribute == null ? null : attribute.getValorDb();

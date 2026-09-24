@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class RepetiriaConverter implements AttributeConverter<Repetiria, String> {
-
   @Override
   public String convertToDatabaseColumn(Repetiria attribute) {
     return attribute == null ? null : attribute.getValorDb();

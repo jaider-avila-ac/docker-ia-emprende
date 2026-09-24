@@ -25,7 +25,7 @@ const formDesde = (negocio) => ({
 })
 
 export default function NegocioPage() {
-  const { business, estado, crearNegocio, actualizarNegocio } = useBusiness()
+  const { business, estado, actualizarNegocio } = useBusiness()
   const [rubros, setRubros] = useState([])
   const [form, setForm] = useState(() => formDesde(business))
   const [errors, setErrors] = useState({})
@@ -65,12 +65,7 @@ export default function NegocioPage() {
 
     setSaving(true)
     try {
-      if (business) {
-
-        await actualizarNegocio({ ...business, ...form })
-      } else {
-        await crearNegocio(form)
-      }
+      await actualizarNegocio({ ...business, ...form })
       setSaved(true)
     } catch (err) {
       setErrorGeneral(err instanceof ApiError ? err.message : 'No se pudo guardar el negocio.')
@@ -89,12 +84,6 @@ export default function NegocioPage() {
         title="Datos del negocio"
         description="La base para que la IA entienda tu negocio y te ayude con tu presencia digital."
       />
-
-      {!business && (
-        <NoteBox variant="amber">
-          Todavía no has creado tu negocio — completa el formulario y guarda para crear el primero.
-        </NoteBox>
-      )}
 
       <form className="grid grid-cols-1 lg:grid-cols-2 gap-4 text-sm" onSubmit={onSubmit} noValidate>
         {errorGeneral && (
@@ -164,9 +153,9 @@ export default function NegocioPage() {
 
         <div className="lg:col-span-2 flex items-center gap-2">
           <Button variant="success" type="submit" loading={saving}>
-            {saving ? 'Guardando…' : business ? 'Guardar' : 'Crear negocio'}
+            {saving ? 'Guardando…' : 'Guardar'}
           </Button>
-          {business && <Button to="/inteligencia" variant="primary">Generar inteligencia (IA)</Button>}
+          <Button to="/inteligencia" variant="primary">Generar inteligencia (IA)</Button>
           {saved && <span className="text-xs text-emerald-600">✓ Guardado</span>}
         </div>
       </form>

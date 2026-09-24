@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EvaluacionServiceImpl implements EvaluacionService {
-
   private final EvaluacionRepository evaluacionRepository;
   private final IniciativaService iniciativaService;
   private final PlanService planService;
@@ -34,7 +33,6 @@ public class EvaluacionServiceImpl implements EvaluacionService {
   @Override
   @Transactional
   public Evaluacion crear(Long usuarioId, EvaluacionRequest datos) {
-
     var iniciativa = iniciativaService.obtenerPropia(usuarioId, datos.iniciativaId());
 
     Evaluacion evaluacion = new Evaluacion();

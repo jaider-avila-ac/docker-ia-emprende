@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class PilarConverter implements AttributeConverter<Pilar, String> {
-
   @Override
   public String convertToDatabaseColumn(Pilar attribute) {
     return attribute == null ? null : attribute.getValorDb();

@@ -18,7 +18,6 @@ public record IniciativaResponse(
     boolean generadaPorIa,
     String iaTip,
     List<Long> ofertaIds) {
-
   public static IniciativaResponse desde(Iniciativa i) {
     return new IniciativaResponse(
         i.getId(),

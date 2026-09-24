@@ -91,7 +91,6 @@ export default function ResultadosPage() {
         actualizarNegocio({ ...business, costosFijosMensuales: costosFijos === '' ? null : Number(costosFijos) }),
       )
     } catch {
-
     }
   }
 

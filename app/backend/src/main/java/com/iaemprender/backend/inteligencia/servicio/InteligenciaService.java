@@ -5,7 +5,6 @@ import com.iaemprender.backend.inteligencia.dto.MetaSmartResponse;
 import java.util.List;
 
 public interface InteligenciaService {
-
   List<FodaItemResponse> generarFoda(Long usuarioId);
 
   List<FodaItemResponse> listarFoda(Long usuarioId);

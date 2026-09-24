@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
-
   private final UsuarioRepository usuarioRepository;
   private final PasswordEncoder passwordEncoder;
 

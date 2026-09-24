@@ -11,6 +11,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/negocios")
 public class NegocioController {
-
   private final NegocioService negocioService;
 
   public NegocioController(NegocioService negocioService) {
@@ -57,6 +57,12 @@ public class NegocioController {
   @PutMapping("/{id}/activar")
   public NegocioResponse activar(@AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable Long id) {
     return NegocioResponse.desde(negocioService.activar(principal.getId(), id));
+  }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> eliminar(@AuthenticationPrincipal UsuarioPrincipal principal, @PathVariable Long id) {
+    negocioService.eliminar(principal.getId(), id);
+    return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/rubros")

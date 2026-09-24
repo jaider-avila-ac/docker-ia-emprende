@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class ManejadorGlobalExcepciones {
-
   @ExceptionHandler(ApiException.class)
   public ResponseEntity<ErrorResponse> manejarApiException(ApiException ex) {
     return ResponseEntity.status(ex.getEstado())

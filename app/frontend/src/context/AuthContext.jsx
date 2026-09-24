@@ -18,7 +18,6 @@ export function AuthProvider({ children }) {
         setEstado('autenticado')
       })
       .catch(() => {
-
         setUsuario(null)
         setEstado('anonimo')
       })

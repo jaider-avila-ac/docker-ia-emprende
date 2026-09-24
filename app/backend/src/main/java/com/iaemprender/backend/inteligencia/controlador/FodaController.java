@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/inteligencia/foda")
 public class FodaController {
-
   private final InteligenciaService inteligenciaService;
 
   public FodaController(InteligenciaService inteligenciaService) {

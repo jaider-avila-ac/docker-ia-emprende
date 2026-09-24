@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class TipoFodaConverter implements AttributeConverter<TipoFoda, String> {
-
   @Override
   public String convertToDatabaseColumn(TipoFoda attribute) {
     return attribute == null ? null : attribute.getValorDb();

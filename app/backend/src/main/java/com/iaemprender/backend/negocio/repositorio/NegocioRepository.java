@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 public interface NegocioRepository extends JpaRepository<Negocio, Long> {
-
   List<Negocio> findByUsuarioIdOrderByIdAsc(Long usuarioId);
 
   long countByUsuarioId(Long usuarioId);

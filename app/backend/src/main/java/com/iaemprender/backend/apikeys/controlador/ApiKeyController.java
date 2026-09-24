@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/api-keys")
 public class ApiKeyController {
-
   private final ApiKeyService apiKeyService;
 
   public ApiKeyController(ApiKeyService apiKeyService) {

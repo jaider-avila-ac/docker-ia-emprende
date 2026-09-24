@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UsuarioApiKeyRepository extends JpaRepository<UsuarioApiKey, Long> {
-
   List<UsuarioApiKey> findByUsuarioId(Long usuarioId);
 
   Optional<UsuarioApiKey> findByUsuarioIdAndProveedor_Codigo(Long usuarioId, String codigoProveedor);

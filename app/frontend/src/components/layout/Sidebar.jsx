@@ -4,10 +4,11 @@ import { useBusiness } from '../../context/BusinessContext'
 import { useAuth } from '../../context/AuthContext'
 
 const TREE = [
-  { type: 'file', to: '/', label: 'Dashboard', end: true },
+  { type: 'file', to: '/', label: 'Dashboard', end: true, icon: 'bi-speedometer2' },
   {
     type: 'folder',
     label: 'Datos del negocio',
+    icon: 'bi-shop',
     children: [
       { type: 'file', to: '/negocio', label: 'Perfil', end: true },
       { type: 'file', to: '/negocio/ofertas', label: 'Ofertas' },
@@ -19,6 +20,7 @@ const TREE = [
   {
     type: 'folder',
     label: 'Inteligencia',
+    icon: 'bi-stars',
     children: [
       { type: 'file', to: '/inteligencia', label: 'Resumen', end: true },
       { type: 'file', to: '/inteligencia/foda', label: 'FODA' },
@@ -28,11 +30,13 @@ const TREE = [
   {
     type: 'folder',
     label: 'Ejecución',
+    icon: 'bi-rocket-takeoff',
     children: [
       { type: 'file', to: '/iniciativas', label: 'Iniciativas' },
       {
         type: 'folder',
         label: 'Plan semanal',
+        icon: 'bi-calendar-week',
         children: [
           { type: 'file', to: '/plan', label: 'Resumen', end: true },
           { type: 'file', to: '/plan/ajustes', label: 'Ajustes' },
@@ -45,6 +49,7 @@ const TREE = [
   {
     type: 'folder',
     label: 'Sistema',
+    icon: 'bi-gear',
     children: [
       { type: 'file', to: '/configuracion', label: 'Configuración' },
     ],
@@ -91,25 +96,8 @@ function ChevronIcon({ open }) {
   )
 }
 
-function FolderIcon({ open }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="w-4 h-4 shrink-0 text-sky-300">
-      {open ? (
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a1 1 0 0 1 1-1h4.5l1.5 2H20a1 1 0 0 1 1 1l-1.4 8.2a1 1 0 0 1-1 .8H5.4a1 1 0 0 1-1-.83L3 7Z" />
-      ) : (
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 7a1 1 0 0 1 1-1h4.5l1.5 2H20a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V7Z" />
-      )}
-    </svg>
-  )
-}
-
-function FileIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="w-4 h-4 shrink-0 text-indigo-300 opacity-80">
-      <path strokeLinecap="round" strokeLinejoin="round" d="M7 3h6l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
-      <path strokeLinecap="round" strokeLinejoin="round" d="M13 3v5h5" />
-    </svg>
-  )
+function NodeIcon({ icon, className }) {
+  return <i className={`bi ${icon} ${className}`} aria-hidden="true" />
 }
 
 function TreeFile({ node, onNavigate }) {
@@ -124,7 +112,7 @@ function TreeFile({ node, onNavigate }) {
         }`
       }
     >
-      <FileIcon />
+      <NodeIcon icon={node.icon || 'bi-dot'} className="shrink-0 text-indigo-300" />
       <span className="truncate">{node.label}</span>
     </NavLink>
   )
@@ -144,7 +132,7 @@ function TreeFolder({ node, openFolders, onToggle, activeFolders, onNavigate }) 
         }`}
       >
         <ChevronIcon open={isOpen} />
-        <FolderIcon open={isOpen} />
+        <NodeIcon icon={node.icon} className="shrink-0 text-sky-300" />
         <span className="truncate">{node.label}</span>
       </button>
 
@@ -175,7 +163,7 @@ function TreeNode(props) {
 }
 
 export default function Sidebar({ onNavigate }) {
-  const { business } = useBusiness()
+  const { business, salir } = useBusiness()
   const { usuario, logout } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
@@ -183,6 +171,11 @@ export default function Sidebar({ onNavigate }) {
   const cerrarSesion = () => {
     logout()
     navigate('/login', { replace: true })
+  }
+
+  const cambiarNegocio = () => {
+    salir()
+    navigate('/negocios')
   }
 
   const [openFolders, setOpenFolders] = useState(() => new Set(ALL_FOLDER_LABELS))
@@ -235,16 +228,16 @@ export default function Sidebar({ onNavigate }) {
       <div className="px-4">
         <div className="text-[11px] text-indigo-300">Negocio activo</div>
         <div className="mt-1 px-3 py-2 rounded-lg bg-indigo-900/40 border border-indigo-800 text-xs text-indigo-100">
-          {business ? (
-            <>
-              <span className="truncate block">{business.nombre}</span>
-              {business.rubro && <p className="text-indigo-300 mt-0.5">{business.rubro}</p>}
-            </>
-          ) : (
-            <a href="/negocio" className="text-indigo-300 hover:text-indigo-100 hover:underline">
-              Crea tu negocio →
-            </a>
-          )}
+          <span className="truncate block">{business?.nombre}</span>
+          {business?.rubro && <p className="text-indigo-300 mt-0.5">{business.rubro}</p>}
+          <button
+            type="button"
+            onClick={cambiarNegocio}
+            className="mt-2 text-indigo-300 hover:text-white hover:underline"
+          >
+            <i className="bi bi-arrow-left-right mr-1" aria-hidden="true" />
+            Cambiar de negocio
+          </button>
         </div>
       </div>
 

@@ -12,6 +12,7 @@ import { iniciativasApi } from '../../api/iniciativas'
 
 export default function DashboardPage() {
   const { business } = useBusiness()
+  const perfilListo = Boolean(business?.descripcion && business?.publicoObjetivo)
   const [creditsOpen, setCreditsOpen] = useState(false)
   const [datos, setDatos] = useState(null)
 
@@ -40,7 +41,7 @@ export default function DashboardPage() {
   }, [business])
 
   const pasos = datos
-    ? [Boolean(business), datos.ofertas > 0, datos.fodaListo, datos.smartListo, Boolean(datos.plan)]
+    ? [perfilListo, datos.ofertas > 0, datos.fodaListo, datos.smartListo, Boolean(datos.plan)]
     : []
   const porcentaje = pasos.length ? Math.round((pasos.filter(Boolean).length / pasos.length) * 100) : 0
 
@@ -52,7 +53,7 @@ export default function DashboardPage() {
       </PageHeader>
 
       <section className="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <StatTile color="emerald" value={business ? 'Listo' : 'Pendiente'} label="Perfil del negocio" />
+        <StatTile color="emerald" value={perfilListo ? 'Listo' : 'Pendiente'} label="Perfil del negocio" />
         <StatTile color="sky" value={datos ? String(datos.iniciativasActivas) : '—'} label="Iniciativas activas" />
         <StatTile color="amber" value={datos?.plan ? `Sem. ${datos.plan.semanaNumero}` : '—'} label="Plan vigente" />
         <StatTile
@@ -97,15 +98,15 @@ export default function DashboardPage() {
             <div className="h-2 rounded-full bg-emerald-100">
               <div className="h-2 bg-emerald-500 rounded-full transition-all" style={{ width: `${porcentaje}%` }} />
             </div>
-            <p className="text-xs text-gray-500 mt-2">Completado {porcentaje}% (negocio, ofertas, FODA, SMART, plan)</p>
+            <p className="text-xs text-gray-500 mt-2">Completado {porcentaje}% (perfil, ofertas, FODA, SMART, plan)</p>
           </div>
         </div>
 
         <div className="rounded-2xl bg-gray-50 border border-gray-200 p-4">
           <h3 className="font-semibold">Siguiente recomendado</h3>
           <p className="text-sm text-gray-700 mt-2">
-            {!business
-              ? 'Crea tu negocio para empezar.'
+            {!perfilListo
+              ? 'Completa la descripción y el público de tu negocio.'
               : datos?.ofertas === 0
                 ? 'Agrega al menos una oferta.'
                 : !datos?.apiKeyActiva
@@ -116,7 +117,7 @@ export default function DashboardPage() {
                       ? 'Genera tus metas SMART.'
                       : 'Revisa el plan de la semana y qué toca publicar hoy.'}
           </p>
-          <Button to={!business ? '/negocio' : datos?.ofertas === 0 ? '/negocio/ofertas' : !datos?.apiKeyActiva ? '/configuracion' : !datos?.fodaListo ? '/inteligencia/foda' : !datos?.smartListo ? '/inteligencia/smart' : '/plan'} variant="primary" className="inline-flex mt-3">
+          <Button to={!perfilListo ? '/negocio' : datos?.ofertas === 0 ? '/negocio/ofertas' : !datos?.apiKeyActiva ? '/configuracion' : !datos?.fodaListo ? '/inteligencia/foda' : !datos?.smartListo ? '/inteligencia/smart' : '/plan'} variant="primary" className="inline-flex mt-3">
             Ir ahora
           </Button>
         </div>

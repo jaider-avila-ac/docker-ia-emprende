@@ -1,7 +1,6 @@
 import { api } from './client'
 
 export const authApi = {
-
   registrar: (datos) =>
     api.post('/usuarios', {
       correo: datos.correo,

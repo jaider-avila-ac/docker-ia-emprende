@@ -5,7 +5,6 @@ import com.iaemprender.backend.iniciativas.modelo.Iniciativa;
 import java.util.List;
 
 public interface IniciativaService {
-
   Iniciativa crear(Long usuarioId, IniciativaRequest datos);
 
   List<Iniciativa> listarDelNegocioActivo(Long usuarioId);

@@ -12,7 +12,6 @@ public record PlanSemanalResponse(
     Integer historiasSugeridas,
     String ventanaHoraria,
     List<PlanAccionResponse> acciones) {
-
   public static PlanSemanalResponse desde(PlanSemanal p, List<PlanAccionResponse> acciones) {
     return new PlanSemanalResponse(
         p.getId(),

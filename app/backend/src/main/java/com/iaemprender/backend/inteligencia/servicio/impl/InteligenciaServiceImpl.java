@@ -35,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InteligenciaServiceImpl implements InteligenciaService {
-
   private static final List<String> ORDEN_PROVEEDORES = List.of("openai", "gemini");
 
   private static final String TIPO_FODA = "foda";
@@ -246,7 +245,6 @@ public class InteligenciaServiceImpl implements InteligenciaService {
       try {
         return generador.apply(proveedor, clave);
       } catch (IaGatewayClaveRechazadaException | IaGatewayNoDisponibleException ex) {
-
       }
     }
     throw new SolicitudInvalidaException(

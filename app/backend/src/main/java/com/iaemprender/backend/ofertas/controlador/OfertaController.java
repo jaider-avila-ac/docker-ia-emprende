@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/ofertas")
 public class OfertaController {
-
   private final OfertaService ofertaService;
 
   public OfertaController(OfertaService ofertaService) {

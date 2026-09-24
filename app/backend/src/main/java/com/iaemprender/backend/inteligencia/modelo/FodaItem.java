@@ -17,7 +17,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class FodaItem {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

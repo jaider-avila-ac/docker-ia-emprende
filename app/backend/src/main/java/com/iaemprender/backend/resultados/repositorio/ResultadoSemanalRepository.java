@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ResultadoSemanalRepository extends JpaRepository<ResultadoSemanal, Long> {
-
   List<ResultadoSemanal> findByNegocioIdOrderByAnioAscSemanaNumeroAsc(Long negocioId);
 
   Optional<ResultadoSemanal> findByIdAndNegocioId(Long id, Long negocioId);

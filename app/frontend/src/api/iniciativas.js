@@ -14,7 +14,6 @@ const aDatos = (iniciativa) => ({
 })
 
 export const iniciativasApi = {
-
   listar: () => api.get('/iniciativas'),
   crear: (iniciativa) => api.post('/iniciativas', aDatos(iniciativa)),
   actualizar: (id, iniciativa) => api.put(`/iniciativas/${id}`, aDatos(iniciativa)),

@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class EstadoIniciativaConverter implements AttributeConverter<EstadoIniciativa, String> {
-
   @Override
   public String convertToDatabaseColumn(EstadoIniciativa attribute) {
     return attribute == null ? null : attribute.getValorDb();

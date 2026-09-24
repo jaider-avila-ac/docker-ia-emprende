@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class IniciativaServiceImpl implements IniciativaService {
-
   private final IniciativaRepository iniciativaRepository;
   private final NegocioService negocioService;
   private final OfertaService ofertaService;

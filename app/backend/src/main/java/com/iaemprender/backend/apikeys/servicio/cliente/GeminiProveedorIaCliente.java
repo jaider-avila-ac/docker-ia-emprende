@@ -8,7 +8,6 @@ import org.springframework.web.client.RestClient;
 
 @Component
 public class GeminiProveedorIaCliente implements ProveedorIaCliente {
-
   private final RestClient restClient;
 
   public GeminiProveedorIaCliente(@Value("${app.proveedores-ia.gemini.base-url}") String baseUrl) {

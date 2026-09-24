@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class DiaSemanaConverter implements AttributeConverter<DiaSemana, String> {
-
   @Override
   public String convertToDatabaseColumn(DiaSemana attribute) {
     return attribute == null ? null : attribute.getValorDb();

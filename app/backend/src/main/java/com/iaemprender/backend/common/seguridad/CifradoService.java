@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class CifradoService {
-
   private static final int TAMANO_IV_BYTES = 12;
   private static final int TAMANO_TAG_BITS = 128;
   private static final String TRANSFORMACION = "AES/GCM/NoPadding";
@@ -21,7 +20,6 @@ public class CifradoService {
   private final SecureRandom aleatorio = new SecureRandom();
 
   public CifradoService(@Value("${app.cifrado.clave-secreta}") String secreto) throws NoSuchAlgorithmException {
-
     byte[] llaveDerivada = MessageDigest.getInstance("SHA-256").digest(secreto.getBytes(StandardCharsets.UTF_8));
     this.llave = new SecretKeySpec(llaveDerivada, "AES");
   }

@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class EstadoApiKeyConverter implements AttributeConverter<EstadoApiKey, String> {
-
   @Override
   public String convertToDatabaseColumn(EstadoApiKey attribute) {
     return attribute == null ? null : attribute.getValorDb();

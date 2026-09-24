@@ -2,10 +2,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { BusinessProvider } from './context/BusinessContext'
 import MainLayout from './components/layout/MainLayout'
-import ProtectedRoute, { RutaPublica } from './components/layout/ProtectedRoute'
+import ProtectedRoute, { RutaPublica, RequiereNegocio } from './components/layout/ProtectedRoute'
 
 import LoginPage from './modules/auth/LoginPage'
 import RegistroPage from './modules/auth/RegistroPage'
+import NegociosPage from './modules/negocios/NegociosPage'
 import DashboardPage from './modules/dashboard/DashboardPage'
 import NegocioPage from './modules/negocio/NegocioPage'
 import OfertasListPage from './modules/negocio/ofertas/OfertasListPage'
@@ -36,30 +37,34 @@ export default function App() {
             </Route>
 
             <Route element={<ProtectedRoute />}>
-              <Route element={<MainLayout />}>
-                <Route path="/" element={<DashboardPage />} />
+              <Route path="/negocios" element={<NegociosPage />} />
 
-                <Route path="/negocio" element={<NegocioPage />} />
-                <Route path="/negocio/ofertas" element={<OfertasListPage />} />
-                <Route path="/negocio/ofertas/nuevo" element={<OfertaFormPage />} />
-                <Route path="/negocio/ofertas/:id/editar" element={<OfertaFormPage />} />
-                <Route path="/negocio/competidores" element={<CompetidoresPage />} />
-                <Route path="/negocio/branding" element={<BrandingPage />} />
-                <Route path="/negocio/resultados" element={<ResultadosPage />} />
+              <Route element={<RequiereNegocio />}>
+                <Route element={<MainLayout />}>
+                  <Route path="/" element={<DashboardPage />} />
 
-                <Route path="/inteligencia" element={<InteligenciaPage />} />
-                <Route path="/inteligencia/foda" element={<FodaPage />} />
-                <Route path="/inteligencia/smart" element={<SmartPage />} />
+                  <Route path="/negocio" element={<NegocioPage />} />
+                  <Route path="/negocio/ofertas" element={<OfertasListPage />} />
+                  <Route path="/negocio/ofertas/nuevo" element={<OfertaFormPage />} />
+                  <Route path="/negocio/ofertas/:id/editar" element={<OfertaFormPage />} />
+                  <Route path="/negocio/competidores" element={<CompetidoresPage />} />
+                  <Route path="/negocio/branding" element={<BrandingPage />} />
+                  <Route path="/negocio/resultados" element={<ResultadosPage />} />
 
-                <Route path="/iniciativas" element={<IniciativasPage />} />
-                <Route path="/iniciativas/:id" element={<IniciativaDetallePage />} />
+                  <Route path="/inteligencia" element={<InteligenciaPage />} />
+                  <Route path="/inteligencia/foda" element={<FodaPage />} />
+                  <Route path="/inteligencia/smart" element={<SmartPage />} />
 
-                <Route path="/plan" element={<PlanPage />} />
-                <Route path="/plan/ajustes" element={<AjustesPlanPage />} />
-                <Route path="/plan/semana/:numero" element={<SemanaPage />} />
+                  <Route path="/iniciativas" element={<IniciativasPage />} />
+                  <Route path="/iniciativas/:id" element={<IniciativaDetallePage />} />
 
-                <Route path="/evaluacion" element={<EvaluacionPage />} />
-                <Route path="/configuracion" element={<ConfiguracionPage />} />
+                  <Route path="/plan" element={<PlanPage />} />
+                  <Route path="/plan/ajustes" element={<AjustesPlanPage />} />
+                  <Route path="/plan/semana/:numero" element={<SemanaPage />} />
+
+                  <Route path="/evaluacion" element={<EvaluacionPage />} />
+                  <Route path="/configuracion" element={<ConfiguracionPage />} />
+                </Route>
               </Route>
             </Route>
           </Routes>

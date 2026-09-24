@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class TipoOfertaConverter implements AttributeConverter<TipoOferta, String> {
-
   @Override
   public String convertToDatabaseColumn(TipoOferta attribute) {
     return attribute == null ? null : attribute.getValorDb();

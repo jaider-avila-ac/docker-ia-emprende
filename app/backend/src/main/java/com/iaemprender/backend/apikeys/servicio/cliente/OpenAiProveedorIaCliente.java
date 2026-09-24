@@ -9,7 +9,6 @@ import org.springframework.web.client.RestClient;
 
 @Component
 public class OpenAiProveedorIaCliente implements ProveedorIaCliente {
-
   private final RestClient restClient;
 
   public OpenAiProveedorIaCliente(@Value("${app.proveedores-ia.openai.base-url}") String baseUrl) {
@@ -33,7 +32,6 @@ public class OpenAiProveedorIaCliente implements ProveedorIaCliente {
     } catch (HttpClientErrorException.Unauthorized ex) {
       return false;
     } catch (HttpClientErrorException ex) {
-
       return true;
     } catch (ResourceAccessException ex) {
       throw new VerificacionNoDisponibleException("No se pudo verificar la clave de OpenAI en este momento.", ex);

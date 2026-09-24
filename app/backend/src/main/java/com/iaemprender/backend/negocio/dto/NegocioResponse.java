@@ -25,7 +25,6 @@ public record NegocioResponse(
     boolean activo,
     List<String> redesActivas,
     List<String> pilares) {
-
   public static NegocioResponse desde(Negocio n) {
     return new NegocioResponse(
         n.getId(),

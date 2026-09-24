@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class NegocioServiceImpl implements NegocioService {
-
   private static final int MAXIMO_NEGOCIOS_POR_USUARIO = 3;
 
   private final NegocioRepository negocioRepository;
@@ -33,7 +32,6 @@ public class NegocioServiceImpl implements NegocioService {
   public Negocio crear(Long usuarioId, NegocioRequest datos) {
     long total = negocioRepository.countByUsuarioId(usuarioId);
     if (total >= MAXIMO_NEGOCIOS_POR_USUARIO) {
-
       throw new ConflictoException("Ya tienes " + MAXIMO_NEGOCIOS_POR_USUARIO + " negocios, el máximo permitido.");
     }
 
@@ -65,6 +63,12 @@ public class NegocioServiceImpl implements NegocioService {
     negocioRepository.desactivarTodosDe(usuarioId);
     negocio.setActivo(true);
     return negocioRepository.save(negocio);
+  }
+
+  @Override
+  @Transactional
+  public void eliminar(Long usuarioId, Long negocioId) {
+    negocioRepository.delete(obtenerPropioOFallar(usuarioId, negocioId));
   }
 
   @Override
@@ -109,7 +113,6 @@ public class NegocioServiceImpl implements NegocioService {
       try {
         resultado.add(desdeValorDb.apply(valor));
       } catch (IllegalArgumentException ex) {
-
       }
     }
     return resultado;

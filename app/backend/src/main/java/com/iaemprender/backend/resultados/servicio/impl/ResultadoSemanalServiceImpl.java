@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ResultadoSemanalServiceImpl implements ResultadoSemanalService {
-
   private final ResultadoSemanalRepository resultadoSemanalRepository;
   private final NegocioService negocioService;
 

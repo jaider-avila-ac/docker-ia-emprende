@@ -6,7 +6,6 @@ import com.iaemprender.backend.plan.modelo.PlanSemanal;
 import java.util.List;
 
 public interface PlanService {
-
   PlanSemanal obtenerOCrearSemanaActual(Long usuarioId);
 
   PlanSemanal actualizarAjustes(Long usuarioId, String tiempoDisponible);

@@ -1,5 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
+import { useBusiness } from '../../context/BusinessContext'
 
 export default function ProtectedRoute() {
   const { estado } = useAuth()
@@ -11,6 +12,15 @@ export default function ProtectedRoute() {
   if (estado === 'anonimo') {
     return <Navigate to="/login" replace state={{ desde: location.pathname }} />
   }
+  return <Outlet />
+}
+
+export function RequiereNegocio() {
+  const { business, estado } = useBusiness()
+  if (estado === 'cargando') {
+    return <div className="min-h-screen grid place-content-center text-sm text-gray-500">Cargando…</div>
+  }
+  if (!business) return <Navigate to="/negocios" replace />
   return <Outlet />
 }
 

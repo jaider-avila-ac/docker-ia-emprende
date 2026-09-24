@@ -25,6 +25,7 @@ export const negociosApi = {
   crear: (negocio) => api.post('/negocios', aDatos(negocio)),
   actualizar: (id, negocio) => api.put(`/negocios/${id}`, aDatos(negocio)),
   activar: (id) => api.put(`/negocios/${id}/activar`),
+  eliminar: (id) => api.del(`/negocios/${id}`),
 
   rubrosDisponibles: () => api.get('/negocios/rubros'),
 }

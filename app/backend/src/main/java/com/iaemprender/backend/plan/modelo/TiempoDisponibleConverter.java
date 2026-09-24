@@ -5,7 +5,6 @@ import jakarta.persistence.Converter;
 
 @Converter(autoApply = true)
 public class TiempoDisponibleConverter implements AttributeConverter<TiempoDisponible, String> {
-
   @Override
   public String convertToDatabaseColumn(TiempoDisponible attribute) {
     return attribute == null ? null : attribute.getValorDb();

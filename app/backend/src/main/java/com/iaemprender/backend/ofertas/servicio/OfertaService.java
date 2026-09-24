@@ -5,7 +5,6 @@ import com.iaemprender.backend.ofertas.modelo.Oferta;
 import java.util.List;
 
 public interface OfertaService {
-
   Oferta crear(Long usuarioId, OfertaRequest datos);
 
   List<Oferta> listarDelNegocioActivo(Long usuarioId);

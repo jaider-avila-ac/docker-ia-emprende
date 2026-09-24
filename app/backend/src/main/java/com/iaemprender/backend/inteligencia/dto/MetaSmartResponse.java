@@ -12,7 +12,6 @@ public record MetaSmartResponse(
     String medicion,
     String pasos,
     boolean generadoPorIa) {
-
   public static MetaSmartResponse desde(MetaSmart m) {
     return new MetaSmartResponse(
         m.getId(),

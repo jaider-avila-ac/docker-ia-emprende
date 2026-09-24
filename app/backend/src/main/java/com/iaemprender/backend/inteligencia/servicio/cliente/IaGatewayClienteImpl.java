@@ -16,11 +16,9 @@ import org.springframework.web.client.RestClient;
 
 @Component
 public class IaGatewayClienteImpl implements IaGatewayCliente {
-
   private final RestClient restClient;
 
   public IaGatewayClienteImpl(@Value("${app.ia-gateway.base-url}") String baseUrl) {
-
     var objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     var conversorJson = new MappingJackson2HttpMessageConverter(objectMapper);
 
@@ -58,7 +56,6 @@ public class IaGatewayClienteImpl implements IaGatewayCliente {
           .retrieve()
           .body(tipoRespuesta);
     } catch (HttpStatusCodeException ex) {
-
       if (ex.getStatusCode() == HttpStatus.UNPROCESSABLE_ENTITY) {
         throw new IaGatewayClaveRechazadaException("El proveedor " + proveedor + " rechazó la clave.");
       }
@@ -66,7 +63,6 @@ public class IaGatewayClienteImpl implements IaGatewayCliente {
     } catch (ResourceAccessException ex) {
       throw new IaGatewayNoDisponibleException("No se pudo contactar al servicio de IA ahora mismo.");
     } catch (HttpMessageConversionException ex) {
-
       throw new IaGatewayNoDisponibleException("El servicio de IA respondió en un formato inesperado.");
     }
   }
@@ -83,7 +79,6 @@ public class IaGatewayClienteImpl implements IaGatewayCliente {
           .retrieve()
           .body(ComparacionContextoRespuesta.class);
     } catch (HttpStatusCodeException | ResourceAccessException | HttpMessageConversionException ex) {
-
       return new ComparacionContextoRespuesta(false, 0.0);
     }
   }

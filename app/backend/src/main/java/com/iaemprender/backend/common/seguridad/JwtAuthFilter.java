@@ -14,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
-
   private final JwtService jwtService;
   private final UsuarioRepository usuarioRepository;
 
@@ -28,7 +27,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       @NonNull HttpServletRequest request,
       @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain) throws ServletException, IOException {
-
     String header = request.getHeader("Authorization");
     if (header == null || !header.startsWith("Bearer ")) {
       filterChain.doFilter(request, response);

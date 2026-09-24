@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/inteligencia/smart")
 public class SmartController {
-
   private final InteligenciaService inteligenciaService;
 
   public SmartController(InteligenciaService inteligenciaService) {

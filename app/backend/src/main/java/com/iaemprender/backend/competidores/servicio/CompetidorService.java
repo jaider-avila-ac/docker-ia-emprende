@@ -5,7 +5,6 @@ import com.iaemprender.backend.competidores.modelo.Competidor;
 import java.util.List;
 
 public interface CompetidorService {
-
   Competidor crear(Long usuarioId, CompetidorRequest datos);
 
   List<Competidor> listarDelNegocioActivo(Long usuarioId);

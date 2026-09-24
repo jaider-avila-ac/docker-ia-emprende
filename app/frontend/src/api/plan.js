@@ -1,7 +1,6 @@
 import { api } from './client'
 
 export const planApi = {
-
   actual: () => api.get('/plan/actual'),
   ajustar: (tiempoDisponible) => api.put('/plan/ajustes', { tiempoDisponible }),
 

@@ -18,7 +18,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class Oferta {
-
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;

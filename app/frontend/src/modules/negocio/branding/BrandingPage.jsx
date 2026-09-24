@@ -37,7 +37,6 @@ export default function BrandingPage() {
     e.preventDefault()
     setErrorGeneral('')
     try {
-
       await run(() => actualizarNegocio({ ...business, ...form }))
     } catch (err) {
       setErrorGeneral(err instanceof ApiError ? err.message : 'No se pudo guardar el branding.')

@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/iniciativas")
 public class IniciativaController {
-
   private final IniciativaService iniciativaService;
 
   public IniciativaController(IniciativaService iniciativaService) {

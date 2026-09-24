@@ -12,7 +12,6 @@ public record EvaluacionResponse(
     String repetiria,
     String comentarios,
     LocalDateTime creadoEn) {
-
   public static EvaluacionResponse desde(Evaluacion e) {
     return new EvaluacionResponse(
         e.getId(),
