@@ -1,27 +1,25 @@
 from datetime import date
-from typing import Annotated
 
 from pydantic import BaseModel, Field, field_validator
 
 from app.modelos import limites
-
-TextoFoda = Annotated[str, Field(min_length=1, max_length=limites.FODA_ITEM)]
+from app.modelos.tipos import texto
 
 
 class FodaRespuesta(BaseModel):
-    fortalezas: list[TextoFoda] = Field(min_length=1)
-    oportunidades: list[TextoFoda] = Field(min_length=1)
-    debilidades: list[TextoFoda] = Field(min_length=1)
-    amenazas: list[TextoFoda] = Field(min_length=1)
+    fortalezas: list[texto(limites.FODA_ITEM, 1)] = Field(min_length=1)
+    oportunidades: list[texto(limites.FODA_ITEM, 1)] = Field(min_length=1)
+    debilidades: list[texto(limites.FODA_ITEM, 1)] = Field(min_length=1)
+    amenazas: list[texto(limites.FODA_ITEM, 1)] = Field(min_length=1)
 
 
 class MetaSmartIA(BaseModel):
-    titulo: str = Field(min_length=1, max_length=limites.SMART_TITULO)
-    especifico: str = Field(max_length=limites.SMART_ESPECIFICO)
-    numero_meta: str = Field(max_length=limites.SMART_NUMERO_META)
+    titulo: texto(limites.SMART_TITULO, 1)
+    especifico: texto(limites.SMART_ESPECIFICO)
+    numero_meta: texto(limites.SMART_NUMERO_META)
     dias_plazo: int
-    medicion: str = Field(max_length=limites.SMART_MEDICION)
-    pasos: str = Field(max_length=limites.SMART_PASOS)
+    medicion: texto(limites.SMART_MEDICION)
+    pasos: texto(limites.SMART_PASOS)
 
     @field_validator("dias_plazo", mode="before")
     @classmethod

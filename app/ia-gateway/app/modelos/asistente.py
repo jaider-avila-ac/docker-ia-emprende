@@ -1,9 +1,8 @@
-from typing import Annotated
-
 from pydantic import BaseModel, Field, field_validator
 
 from app.modelos import limites
 from app.modelos.contexto import ContextoNegocio
+from app.modelos.tipos import texto
 
 
 def _entre(valor, minimo, maximo):
@@ -34,14 +33,14 @@ class SolicitudAsistente(BaseModel):
 
 
 class IniciativaIA(BaseModel):
-    titulo: str = Field(min_length=1, max_length=limites.INICIATIVA_TITULO)
+    titulo: texto(limites.INICIATIVA_TITULO, 1)
     meta_tipo: str | None = None
     pilar: str | None = None
-    descripcion: str = Field(max_length=limites.INICIATIVA_DESCRIPCION)
+    descripcion: texto(limites.INICIATIVA_DESCRIPCION)
     impacto: int
     confianza: int
     esfuerzo: int
-    ia_tip: str = Field(max_length=limites.INICIATIVA_TIP)
+    ia_tip: texto(limites.INICIATIVA_TIP)
 
     @field_validator("impacto", "confianza", "esfuerzo", mode="before")
     @classmethod
@@ -65,7 +64,7 @@ class IniciativasRespuesta(BaseModel):
 
 class AccionPlanIA(BaseModel):
     dia_semana: str
-    descripcion: str = Field(min_length=1, max_length=limites.ACCION_PLAN)
+    descripcion: texto(limites.ACCION_PLAN, 1)
 
     @field_validator("dia_semana", mode="after")
     @classmethod
@@ -82,11 +81,8 @@ class PlanRespuesta(BaseModel):
         return [a for a in acciones if isinstance(a, dict) and limites.canonico(a.get("dia_semana"), limites.DIAS)]
 
 
-PuntoAnalisis = Annotated[str, Field(min_length=1, max_length=limites.ANALISIS_ITEM)]
-
-
 class AnalisisRespuesta(BaseModel):
-    resumen: str = Field(min_length=1, max_length=limites.ANALISIS_RESUMEN)
-    que_funciono: list[PuntoAnalisis] = Field(default_factory=list)
-    que_cambiar: list[PuntoAnalisis] = Field(default_factory=list)
-    siguiente_paso: str = Field(min_length=1, max_length=limites.ANALISIS_PASO)
+    resumen: texto(limites.ANALISIS_RESUMEN, 1)
+    que_funciono: list[texto(limites.ANALISIS_ITEM, 1)] = Field(default_factory=list)
+    que_cambiar: list[texto(limites.ANALISIS_ITEM, 1)] = Field(default_factory=list)
+    siguiente_paso: texto(limites.ANALISIS_PASO, 1)
