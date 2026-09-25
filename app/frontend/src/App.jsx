@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { BusinessProvider } from './context/BusinessContext'
 import MainLayout from './components/layout/MainLayout'
@@ -11,8 +11,6 @@ import DashboardPage from './modules/dashboard/DashboardPage'
 import NegocioPage from './modules/negocio/NegocioPage'
 import OfertasListPage from './modules/negocio/ofertas/OfertasListPage'
 import OfertaFormPage from './modules/negocio/ofertas/OfertaFormPage'
-import CompetidoresPage from './modules/negocio/competidores/CompetidoresPage'
-import BrandingPage from './modules/negocio/branding/BrandingPage'
 import ResultadosPage from './modules/negocio/resultados/ResultadosPage'
 import InteligenciaPage from './modules/inteligencia/InteligenciaPage'
 import FodaPage from './modules/inteligencia/FodaPage'
@@ -47,8 +45,6 @@ export default function App() {
                   <Route path="/negocio/ofertas" element={<OfertasListPage />} />
                   <Route path="/negocio/ofertas/nuevo" element={<OfertaFormPage />} />
                   <Route path="/negocio/ofertas/:id/editar" element={<OfertaFormPage />} />
-                  <Route path="/negocio/competidores" element={<CompetidoresPage />} />
-                  <Route path="/negocio/branding" element={<BrandingPage />} />
                   <Route path="/negocio/resultados" element={<ResultadosPage />} />
 
                   <Route path="/inteligencia" element={<InteligenciaPage />} />
@@ -67,6 +63,7 @@ export default function App() {
                 </Route>
               </Route>
             </Route>
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </BusinessProvider>

@@ -3,7 +3,6 @@ package com.iaemprender.backend.inteligencia.servicio;
 import com.iaemprender.backend.inteligencia.dto.FodaItemResponse;
 import com.iaemprender.backend.inteligencia.dto.MetaSmartResponse;
 import com.iaemprender.backend.inteligencia.dto.AnalisisResponse;
-import com.iaemprender.backend.inteligencia.dto.BrandingSugerenciaResponse;
 import com.iaemprender.backend.inteligencia.dto.FodaItemRequest;
 import com.iaemprender.backend.inteligencia.dto.MetaSmartRequest;
 import com.iaemprender.backend.iniciativas.dto.IniciativaResponse;
@@ -30,8 +29,6 @@ public interface InteligenciaService {
   List<IniciativaResponse> generarIniciativas(Long usuarioId);
 
   PlanSemanalResponse generarPlan(Long usuarioId);
-
-  BrandingSugerenciaResponse sugerirBranding(Long usuarioId);
 
   AnalisisResponse analizar(Long usuarioId);
 }

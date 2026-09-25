@@ -10,7 +10,5 @@ public record ContextoNegocioGateway(
     @JsonProperty("publico_objetivo") String publicoObjetivo,
     String diferenciador,
     List<String> ofertas,
-    String tagline,
     String tono,
-    List<String> pilares,
-    List<String> competidores) {}
+    List<String> pilares) {}

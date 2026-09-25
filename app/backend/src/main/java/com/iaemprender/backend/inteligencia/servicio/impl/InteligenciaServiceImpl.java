@@ -4,18 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iaemprender.backend.apikeys.dto.ApiKeyEstadoResponse;
 import com.iaemprender.backend.apikeys.servicio.ApiKeyService;
 import com.iaemprender.backend.common.excepcion.SolicitudInvalidaException;
-import com.iaemprender.backend.competidores.modelo.Competidor;
-import com.iaemprender.backend.competidores.servicio.CompetidorService;
 import com.iaemprender.backend.common.excepcion.RecursoNoEncontradoException;
 import com.iaemprender.backend.evaluacion.modelo.Evaluacion;
 import com.iaemprender.backend.evaluacion.servicio.EvaluacionService;
 import com.iaemprender.backend.inteligencia.dto.AnalisisResponse;
-import com.iaemprender.backend.inteligencia.dto.BrandingSugerenciaResponse;
 import com.iaemprender.backend.inteligencia.dto.FodaItemRequest;
 import com.iaemprender.backend.inteligencia.dto.FodaItemResponse;
 import com.iaemprender.backend.inteligencia.dto.MetaSmartRequest;
 import com.iaemprender.backend.inteligencia.servicio.cliente.AnalisisGatewayRespuesta;
-import com.iaemprender.backend.inteligencia.servicio.cliente.BrandingGatewayRespuesta;
 import com.iaemprender.backend.inteligencia.servicio.cliente.DatosAsistente;
 import com.iaemprender.backend.inteligencia.servicio.cliente.IniciativasGatewayRespuesta;
 import com.iaemprender.backend.inteligencia.servicio.cliente.PlanGateway;
@@ -74,7 +70,6 @@ public class InteligenciaServiceImpl implements InteligenciaService {
   private final NegocioIaCacheRepository negocioIaCacheRepository;
   private final NegocioService negocioService;
   private final OfertaService ofertaService;
-  private final CompetidorService competidorService;
   private final ApiKeyService apiKeyService;
   private final IaGatewayCliente iaGatewayCliente;
   private final IniciativaService iniciativaService;
@@ -89,7 +84,6 @@ public class InteligenciaServiceImpl implements InteligenciaService {
       NegocioIaCacheRepository negocioIaCacheRepository,
       NegocioService negocioService,
       OfertaService ofertaService,
-      CompetidorService competidorService,
       ApiKeyService apiKeyService,
       IaGatewayCliente iaGatewayCliente,
       IniciativaService iniciativaService,
@@ -100,7 +94,6 @@ public class InteligenciaServiceImpl implements InteligenciaService {
     this.planService = planService;
     this.evaluacionService = evaluacionService;
     this.resultadoSemanalService = resultadoSemanalService;
-    this.competidorService = competidorService;
     this.fodaItemRepository = fodaItemRepository;
     this.metaSmartRepository = metaSmartRepository;
     this.negocioIaCacheRepository = negocioIaCacheRepository;
@@ -332,28 +325,6 @@ public class InteligenciaServiceImpl implements InteligenciaService {
   }
 
   @Override
-  public BrandingSugerenciaResponse sugerirBranding(Long usuarioId) {
-    Negocio negocio = negocioService.obtenerActivo(usuarioId);
-    var contexto = construirContexto(negocio, usuarioId);
-    var datos = new DatosAsistente(fodaPorTipo(negocio.getId()), List.of(), List.of(), List.of(), List.of(), null);
-
-    List<String> proveedores = proveedoresDisponibles(usuarioId);
-    BrandingGatewayRespuesta r = generarConRespaldo(
-        usuarioId, proveedores, (proveedor, clave) ->
-            iaGatewayCliente.sugerirBranding(proveedor, clave, contexto, datos));
-
-    List<String> pilares = r.pilares() == null
-        ? List.of()
-        : r.pilares().stream().filter(this::pilarValido).distinct().toList();
-    return new BrandingSugerenciaResponse(
-        recortar(r.tagline(), 255),
-        recortar(r.tono(), 255),
-        pilares,
-        recortar(r.colores(), 255),
-        recortar(r.referenciasEstilo(), 255));
-  }
-
-  @Override
   public AnalisisResponse analizar(Long usuarioId) {
     Negocio negocio = negocioService.obtenerActivo(usuarioId);
     var contexto = construirContexto(negocio, usuarioId);
@@ -467,23 +438,8 @@ public class InteligenciaServiceImpl implements InteligenciaService {
         negocio.getPublicoObjetivo(),
         negocio.getDiferenciador(),
         ofertaService.listarDelNegocioActivo(usuarioId).stream().map(o -> o.getNombre()).toList(),
-        negocio.getTagline(),
         negocio.getTono(),
-        negocio.getPilares().stream().map(Pilar::getValorDb).toList(),
-        competidorService.listarDelNegocioActivo(usuarioId).stream()
-            .map(this::describirCompetidor)
-            .toList());
-  }
-
-  private String describirCompetidor(Competidor c) {
-    StringBuilder texto = new StringBuilder(c.getNombre());
-    if (c.getCanal() != null && !c.getCanal().isBlank()) {
-      texto.append(" (").append(c.getCanal()).append(")");
-    }
-    if (c.getNotas() != null && !c.getNotas().isBlank()) {
-      texto.append(": ").append(c.getNotas());
-    }
-    return texto.toString();
+        negocio.getPilares().stream().map(Pilar::getValorDb).toList());
   }
 
   private boolean esRedundante(Long negocioId, String tipo, ContextoNegocioGateway actual) {

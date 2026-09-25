@@ -10,9 +10,6 @@ public interface IaGatewayCliente {
 
   PlanGatewayRespuesta generarPlan(String proveedor, String claveApi, ContextoNegocioGateway contexto, DatosAsistente datos);
 
-  BrandingGatewayRespuesta sugerirBranding(
-      String proveedor, String claveApi, ContextoNegocioGateway contexto, DatosAsistente datos);
-
   AnalisisGatewayRespuesta analizar(String proveedor, String claveApi, ContextoNegocioGateway contexto, DatosAsistente datos);
 
   ComparacionContextoRespuesta compararContexto(ContextoNegocioGateway actual, ContextoNegocioGateway anterior);

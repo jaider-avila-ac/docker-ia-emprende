@@ -59,14 +59,6 @@ class PlanRespuesta(BaseModel):
     acciones: list[AccionPlanIA] = Field(min_length=1)
 
 
-class BrandingRespuesta(BaseModel):
-    tagline: str
-    tono: str
-    pilares: list[str] = Field(default_factory=list)
-    colores: str
-    referencias_estilo: str
-
-
 class AnalisisRespuesta(BaseModel):
     resumen: str
     que_funciono: list[str] = Field(default_factory=list)

@@ -11,6 +11,7 @@ import { negociosApi } from '../../api/negocios'
 import { ApiError } from '../../api/client'
 
 const REDES = ['Instagram', 'Facebook', 'TikTok', 'WhatsApp Business']
+const PILARES = ['Educativo', 'Oferta', 'Prueba social', 'Interacción', 'Servicio']
 
 const formDesde = (negocio) => ({
   nombre: negocio?.nombre || '',
@@ -22,6 +23,8 @@ const formDesde = (negocio) => ({
   vendeEnLinea: negocio?.vendeEnLinea || false,
   coberturaEnvio: negocio?.coberturaEnvio || '',
   redesActivas: negocio?.redesActivas || [],
+  tono: negocio?.tono || '',
+  pilares: negocio?.pilares || [],
 })
 
 export default function NegocioPage() {
@@ -52,6 +55,12 @@ export default function NegocioPage() {
       redesActivas: prev.redesActivas.includes(red)
         ? prev.redesActivas.filter((r) => r !== red)
         : [...prev.redesActivas, red],
+    }))
+
+  const togglePilar = (pilar) =>
+    setForm((prev) => ({
+      ...prev,
+      pilares: prev.pilares.includes(pilar) ? prev.pilares.filter((p) => p !== pilar) : [...prev.pilares, pilar],
     }))
 
   const onSubmit = async (e) => {
@@ -151,6 +160,25 @@ export default function NegocioPage() {
           </div>
         </Card>
 
+        <Card className="lg:col-span-2 space-y-3">
+          <h2 className="text-sm font-semibold">¿Cómo quieres comunicar?</h2>
+          <Field label="Tono de comunicación">
+            <Input
+              value={form.tono}
+              onChange={onChange('tono')}
+              placeholder="Ej.: Cercano, amable y con humor"
+            />
+          </Field>
+          <fieldset>
+            <legend className="text-sm mb-1">Pilares de contenido</legend>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-xs">
+              {PILARES.map((p) => (
+                <Checkbox key={p} label={p} checked={form.pilares.includes(p)} onChange={() => togglePilar(p)} />
+              ))}
+            </div>
+          </fieldset>
+        </Card>
+
         <div className="lg:col-span-2 flex items-center gap-2">
           <Button variant="success" type="submit" loading={saving}>
             {saving ? 'Guardando…' : 'Guardar'}
@@ -161,10 +189,8 @@ export default function NegocioPage() {
       </form>
 
       {business && (
-        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <NegocioNavCard to="/negocio/ofertas" color="emerald" title="Ofertas (prod/serv)" description="Lo que ofreces, para mencionarlo en tus publicaciones." />
-          <NegocioNavCard to="/negocio/competidores" color="sky" title="Competidores" description="Qué hacen otros negocios parecidos en redes." />
-          <NegocioNavCard to="/negocio/branding" color="amber" title="Branding" description="Cómo quieres presentarte y qué tono usar." />
           <NegocioNavCard to="/negocio/resultados" color="rose" title="Resultados" description="Mide si lo que publicaste realmente funcionó." />
         </section>
       )}

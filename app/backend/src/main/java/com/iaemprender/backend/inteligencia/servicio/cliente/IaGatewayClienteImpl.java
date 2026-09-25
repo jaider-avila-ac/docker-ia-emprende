@@ -71,12 +71,6 @@ public class IaGatewayClienteImpl implements IaGatewayCliente {
   }
 
   @Override
-  public BrandingGatewayRespuesta sugerirBranding(
-      String proveedor, String claveApi, ContextoNegocioGateway contexto, DatosAsistente datos) {
-    return asistente("/asistente/branding", proveedor, claveApi, contexto, datos, BrandingGatewayRespuesta.class);
-  }
-
-  @Override
   public AnalisisGatewayRespuesta analizar(
       String proveedor, String claveApi, ContextoNegocioGateway contexto, DatosAsistente datos) {
     return asistente("/asistente/analisis", proveedor, claveApi, contexto, datos, AnalisisGatewayRespuesta.class);

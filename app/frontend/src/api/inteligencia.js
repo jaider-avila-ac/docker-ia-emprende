@@ -22,6 +22,5 @@ export const inteligenciaApi = {
 
   generarIniciativas: () => api.post('/inteligencia/iniciativas/generar'),
   generarPlan: () => api.post('/inteligencia/plan/generar'),
-  sugerirBranding: () => api.post('/inteligencia/branding/sugerir'),
   analizar: () => api.post('/inteligencia/analisis'),
 }

@@ -56,16 +56,7 @@ public class Negocio {
   private String diferenciador;
 
   @Column(length = 255)
-  private String tagline;
-
-  @Column(length = 255)
   private String tono;
-
-  @Column(length = 255)
-  private String colores;
-
-  @Column(name = "referencias_estilo", length = 255)
-  private String referenciasEstilo;
 
   @Column(name = "costos_fijos_mensuales", precision = 12, scale = 2)
   private BigDecimal costosFijosMensuales;

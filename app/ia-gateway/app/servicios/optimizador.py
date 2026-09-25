@@ -5,8 +5,6 @@ LIMITE_DIFERENCIADOR = 300
 LIMITE_OFERTAS = 8
 LIMITE_TONO = 150
 LIMITE_PILARES = 5
-LIMITE_COMPETIDORES = 5
-LIMITE_COMPETIDOR_TEXTO = 200
 
 _CARACTERES_POR_TOKEN = 4
 
@@ -30,11 +28,5 @@ def recortar_contexto(contexto: ContextoNegocio) -> ContextoNegocio:
 
     if len(recortado.pilares) > LIMITE_PILARES:
         recortado.pilares = recortado.pilares[:LIMITE_PILARES]
-
-    if len(recortado.competidores) > LIMITE_COMPETIDORES:
-        recortado.competidores = recortado.competidores[:LIMITE_COMPETIDORES]
-    recortado.competidores = [
-        c if len(c) <= LIMITE_COMPETIDOR_TEXTO else c[:LIMITE_COMPETIDOR_TEXTO] + "…" for c in recortado.competidores
-    ]
 
     return recortado

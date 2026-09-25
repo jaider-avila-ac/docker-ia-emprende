@@ -7,14 +7,12 @@ from app.excepciones import (
 )
 from app.modelos.asistente import (
     AnalisisRespuesta,
-    BrandingRespuesta,
     IniciativasRespuesta,
     PlanRespuesta,
     SolicitudAsistente,
 )
 from app.prompts.asistente import (
     construir_prompt_analisis,
-    construir_prompt_branding,
     construir_prompt_iniciativas,
     construir_prompt_plan,
 )
@@ -42,11 +40,6 @@ def iniciativas(solicitud: SolicitudAsistente) -> IniciativasRespuesta:
 @router.post("/plan", response_model=PlanRespuesta)
 def plan(solicitud: SolicitudAsistente) -> PlanRespuesta:
     return _ejecutar(solicitud, construir_prompt_plan, PlanRespuesta)
-
-
-@router.post("/branding", response_model=BrandingRespuesta)
-def branding(solicitud: SolicitudAsistente) -> BrandingRespuesta:
-    return _ejecutar(solicitud, construir_prompt_branding, BrandingRespuesta)
 
 
 @router.post("/analisis", response_model=AnalisisRespuesta)

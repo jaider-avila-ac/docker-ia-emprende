@@ -13,10 +13,7 @@ public record NegocioRequest(
     String descripcion,
     String publicoObjetivo,
     String diferenciador,
-    String tagline,
     String tono,
-    String colores,
-    String referenciasEstilo,
     BigDecimal costosFijosMensuales,
     List<String> redesActivas,
     List<String> pilares) {}

@@ -95,10 +95,7 @@ public class NegocioServiceImpl implements NegocioService {
     negocio.setDescripcion(datos.descripcion());
     negocio.setPublicoObjetivo(datos.publicoObjetivo());
     negocio.setDiferenciador(datos.diferenciador());
-    negocio.setTagline(datos.tagline());
     negocio.setTono(datos.tono());
-    negocio.setColores(datos.colores());
-    negocio.setReferenciasEstilo(datos.referenciasEstilo());
     negocio.setCostosFijosMensuales(datos.costosFijosMensuales());
     negocio.setRedesActivas(parsearValores(datos.redesActivas(), RedSocial::desdeValorDb));
     negocio.setPilares(parsearValores(datos.pilares(), Pilar::desdeValorDb));

@@ -21,10 +21,8 @@ def texto_de_contexto(contexto: ContextoNegocio) -> str:
         contexto.publico_objetivo or "",
         contexto.diferenciador or "",
         ", ".join(contexto.ofertas),
-        contexto.tagline or "",
         contexto.tono or "",
         ", ".join(contexto.pilares),
-        "; ".join(contexto.competidores),
     ]
     return " | ".join(partes)
 

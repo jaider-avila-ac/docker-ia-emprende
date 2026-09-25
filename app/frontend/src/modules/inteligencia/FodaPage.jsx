@@ -131,7 +131,7 @@ export default function FodaPage() {
         <Card>
           <EmptyState
             title="Todavía no has generado tu FODA"
-            description="La IA lo arma a partir de los datos de tu negocio, tus ofertas, competidores y branding. Después puedes editar lo que quieras. La primera vez puede tardar hasta un minuto."
+            description="La IA lo arma a partir de los datos de tu negocio, tus ofertas, tono y pilares de contenido. Después puedes editar lo que quieras. La primera vez puede tardar hasta un minuto."
             action={
               <Button variant="success" loading={generando} onClick={generar}>
                 {generando ? 'Generando… (puede tardar hasta 1 min)' : 'Generar FODA con IA'}

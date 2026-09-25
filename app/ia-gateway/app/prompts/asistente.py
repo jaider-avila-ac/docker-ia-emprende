@@ -83,25 +83,6 @@ def construir_prompt_plan(s: SolicitudAsistente, contexto) -> str:
     )
 
 
-def construir_prompt_branding(s: SolicitudAsistente, contexto) -> str:
-    esquema = (
-        '{"tagline": "...", "tono": "...", "pilares": ["Educativo|Oferta|Prueba social|Interacción|Servicio", '
-        '"... entre 2 y 4"], "colores": "...", "referencias_estilo": "..."}'
-    )
-    return (
-        _ROL
-        + f"{describir_contexto(contexto)}\n"
-        + _foda_texto(s.foda)
-        + "\nPropón la identidad de marca del negocio para sus redes. 'tagline' es una frase corta y memorable "
-        "(máximo 80 caracteres). 'tono' describe cómo debe hablar el negocio (máximo 100 caracteres). 'pilares' "
-        "son entre 2 y 4 de los valores permitidos, los que mejor le convienen. 'colores' sugiere una paleta "
-        "simple con nombres de colores (máximo 120 caracteres). 'referencias_estilo' describe el estilo "
-        "visual y de fotografía recomendado (máximo 200 caracteres).\n\n"
-        + _SOLO_JSON
-        + esquema
-    )
-
-
 def construir_prompt_analisis(s: SolicitudAsistente, contexto) -> str:
     esquema = (
         '{"resumen": "...", "que_funciono": ["..."], "que_cambiar": ["..."], "siguiente_paso": "..."}'

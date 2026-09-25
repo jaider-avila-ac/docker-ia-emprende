@@ -69,7 +69,7 @@ export default function DashboardPage() {
             <h2 className="text-base font-semibold">Datos del negocio</h2>
             <span className="text-[10px] px-2 py-0.5 rounded bg-sky-500/10 text-sky-700 border border-sky-400/30">Paso 1</span>
           </div>
-          <p className="text-sm text-gray-700 mt-2">Completa Perfil, Ofertas, Competidores y Branding.</p>
+          <p className="text-sm text-gray-700 mt-2">Completa tu Perfil y tus Ofertas.</p>
         </a>
 
         <a href="/inteligencia" className="group rounded-2xl bg-gray-50 border border-gray-200 p-4 hover:border-sky-300">

@@ -23,8 +23,6 @@ const TREE = [
     children: [
       { type: 'file', to: '/negocio', label: 'Perfil', end: true },
       { type: 'file', to: '/negocio/ofertas', label: 'Ofertas' },
-      { type: 'file', to: '/negocio/competidores', label: 'Competidores' },
-      { type: 'file', to: '/negocio/branding', label: 'Branding' },
       { type: 'file', to: '/negocio/resultados', label: 'Resultados' },
     ],
   },
