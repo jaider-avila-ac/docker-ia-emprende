@@ -18,6 +18,8 @@ public interface PlanService {
 
   PlanAccion agregarAccion(Long usuarioId, int anio, int semanaNumero, PlanAccionRequest datos);
 
+  PlanSemanal reemplazarAccionesSemanaActual(Long usuarioId, List<PlanAccionRequest> acciones);
+
   PlanAccion actualizarAccion(Long usuarioId, Long accionId, PlanAccionRequest datos);
 
   void eliminarAccion(Long usuarioId, Long accionId);

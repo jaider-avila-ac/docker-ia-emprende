@@ -93,6 +93,20 @@ public class PlanServiceImpl implements PlanService {
 
   @Override
   @Transactional
+  public PlanSemanal reemplazarAccionesSemanaActual(Long usuarioId, List<PlanAccionRequest> acciones) {
+    PlanSemanal plan = obtenerOCrearSemanaActual(usuarioId);
+    planAccionRepository.deleteByPlanSemanalId(plan.getId());
+    for (PlanAccionRequest datos : acciones) {
+      PlanAccion accion = new PlanAccion();
+      accion.setPlanSemanal(plan);
+      aplicarDatosAccion(accion, datos);
+      planAccionRepository.save(accion);
+    }
+    return plan;
+  }
+
+  @Override
+  @Transactional
   public PlanAccion actualizarAccion(Long usuarioId, Long accionId, PlanAccionRequest datos) {
     PlanAccion accion = obtenerAccionPropiaOFallar(usuarioId, accionId);
     aplicarDatosAccion(accion, datos);

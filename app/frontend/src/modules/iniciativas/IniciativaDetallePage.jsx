@@ -3,7 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import NoteBox from '../../components/ui/NoteBox'
-import { Field, Select, Textarea, Checkbox } from '../../components/ui/Field'
+import { Field, Input, Select, Textarea, Checkbox } from '../../components/ui/Field'
 import { ESTADO_COLOR } from './data'
 import { iniciativasApi } from '../../api/iniciativas'
 import { ofertasApi } from '../../api/ofertas'
@@ -15,6 +15,9 @@ export default function IniciativaDetallePage() {
   const [iniciativa, setIniciativa] = useState(null)
   const [ofertas, setOfertas] = useState([])
   const [estado, setEstado] = useState('')
+  const [titulo, setTitulo] = useState('')
+  const [descripcion, setDescripcion] = useState('')
+  const [ice, setIce] = useState({ impacto: '3', confianza: '3', esfuerzo: '3' })
   const [notas, setNotas] = useState('')
   const [ofertaIds, setOfertaIds] = useState([])
   const [cargando, setCargando] = useState(true)
@@ -32,6 +35,13 @@ export default function IniciativaDetallePage() {
         }
         setIniciativa(encontrada)
         setEstado(encontrada.estado)
+        setTitulo(encontrada.titulo)
+        setDescripcion(encontrada.descripcion || '')
+        setIce({
+          impacto: String(encontrada.impacto),
+          confianza: String(encontrada.confianza),
+          esfuerzo: String(encontrada.esfuerzo),
+        })
         setNotas(encontrada.notas || '')
         setOfertaIds(encontrada.ofertaIds || [])
         setOfertas(ofertas)
@@ -45,9 +55,28 @@ export default function IniciativaDetallePage() {
 
   const guardar = async () => {
     setError('')
+    if (!titulo.trim()) {
+      setError('El título no puede quedar vacío.')
+      return
+    }
+    for (const valor of Object.values(ice)) {
+      const n = Number(valor)
+      if (!Number.isInteger(n) || n < 1 || n > 5) {
+        setError('Impacto, confianza y esfuerzo deben ser números de 1 a 5.')
+        return
+      }
+    }
     setGuardando(true)
     try {
-      const actualizada = await iniciativasApi.actualizar(id, { ...iniciativa, estado, notas, ofertaIds })
+      const actualizada = await iniciativasApi.actualizar(id, {
+        ...iniciativa,
+        ...ice,
+        titulo: titulo.trim(),
+        descripcion,
+        estado,
+        notas,
+        ofertaIds,
+      })
       setIniciativa(actualizada)
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'No se pudo guardar.')
@@ -98,8 +127,23 @@ export default function IniciativaDetallePage() {
 
       <section className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-4">
         <Card as="article" className="text-sm">
-          <h2 className="text-base font-semibold">Descripción</h2>
-          <p className="text-gray-700 mt-2">{iniciativa.descripcion || '—'}</p>
+          <Field label="Título">
+            <Input focus="amber" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+          </Field>
+          <Field label="Descripción" className="block mt-3">
+            <Textarea focus="amber" rows={3} value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
+          </Field>
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            <Field label="Impacto (1-5)">
+              <Input focus="amber" value={ice.impacto} onChange={(e) => setIce({ ...ice, impacto: e.target.value })} />
+            </Field>
+            <Field label="Confianza (1-5)">
+              <Input focus="amber" value={ice.confianza} onChange={(e) => setIce({ ...ice, confianza: e.target.value })} />
+            </Field>
+            <Field label="Esfuerzo (1-5)">
+              <Input focus="amber" value={ice.esfuerzo} onChange={(e) => setIce({ ...ice, esfuerzo: e.target.value })} />
+            </Field>
+          </div>
 
           <div className="mt-3">
             <h3 className="font-semibold text-sm">Ofertas vinculadas</h3>
@@ -154,9 +198,8 @@ export default function IniciativaDetallePage() {
       </section>
 
       <NoteBox>
-        <strong>Nota:</strong> Esta iniciativa puede ser <span className="text-emerald-700">generada por IA</span> o
-        escrita por el <span className="text-sky-700">usuario</span>. Desde aquí puedes vincular ofertas y enviarla al
-        plan semanal.
+        Esta iniciativa la propuso la <span className="text-emerald-700">IA</span>. Edita lo que quieras, vincula
+        ofertas y cambia su estado; déjala como está si te sirve así.
       </NoteBox>
     </>
   )

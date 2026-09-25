@@ -47,12 +47,71 @@ public class IaGatewayClienteImpl implements IaGatewayCliente {
     return generar("/smart/generar", proveedor, claveApi, contexto, SmartGatewayRespuesta.class);
   }
 
+  private record SolicitudAsistente(
+      String proveedor,
+      @JsonProperty("clave_api") String claveApi,
+      ContextoNegocioGateway negocio,
+      java.util.Map<String, java.util.List<String>> foda,
+      java.util.List<String> metas,
+      java.util.List<String> aprendizajes,
+      java.util.List<String> resultados,
+      java.util.List<String> iniciativas,
+      PlanGateway plan) {}
+
+  @Override
+  public IniciativasGatewayRespuesta generarIniciativas(
+      String proveedor, String claveApi, ContextoNegocioGateway contexto, DatosAsistente datos) {
+    return asistente("/asistente/iniciativas", proveedor, claveApi, contexto, datos, IniciativasGatewayRespuesta.class);
+  }
+
+  @Override
+  public PlanGatewayRespuesta generarPlan(
+      String proveedor, String claveApi, ContextoNegocioGateway contexto, DatosAsistente datos) {
+    return asistente("/asistente/plan", proveedor, claveApi, contexto, datos, PlanGatewayRespuesta.class);
+  }
+
+  @Override
+  public BrandingGatewayRespuesta sugerirBranding(
+      String proveedor, String claveApi, ContextoNegocioGateway contexto, DatosAsistente datos) {
+    return asistente("/asistente/branding", proveedor, claveApi, contexto, datos, BrandingGatewayRespuesta.class);
+  }
+
+  @Override
+  public AnalisisGatewayRespuesta analizar(
+      String proveedor, String claveApi, ContextoNegocioGateway contexto, DatosAsistente datos) {
+    return asistente("/asistente/analisis", proveedor, claveApi, contexto, datos, AnalisisGatewayRespuesta.class);
+  }
+
+  private <T> T asistente(
+      String ruta,
+      String proveedor,
+      String claveApi,
+      ContextoNegocioGateway contexto,
+      DatosAsistente datos,
+      Class<T> tipoRespuesta) {
+    var solicitud = new SolicitudAsistente(
+        proveedor,
+        claveApi,
+        contexto,
+        datos.foda(),
+        datos.metas(),
+        datos.aprendizajes(),
+        datos.resultados(),
+        datos.iniciativas(),
+        datos.plan());
+    return ejecutar(ruta, proveedor, solicitud, tipoRespuesta);
+  }
+
   private <T> T generar(
       String ruta, String proveedor, String claveApi, ContextoNegocioGateway contexto, Class<T> tipoRespuesta) {
+    return ejecutar(ruta, proveedor, new SolicitudGenerar(proveedor, claveApi, contexto), tipoRespuesta);
+  }
+
+  private <T> T ejecutar(String ruta, String proveedor, Object cuerpo, Class<T> tipoRespuesta) {
     try {
       return restClient.post()
           .uri(ruta)
-          .body(new SolicitudGenerar(proveedor, claveApi, contexto))
+          .body(cuerpo)
           .retrieve()
           .body(tipoRespuesta);
     } catch (HttpStatusCodeException ex) {

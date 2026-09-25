@@ -3,6 +3,17 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useBusiness } from '../../context/BusinessContext'
 import { useAuth } from '../../context/AuthContext'
 
+function semanaIsoActual() {
+  const hoy = new Date()
+  const fecha = new Date(Date.UTC(hoy.getFullYear(), hoy.getMonth(), hoy.getDate()))
+  const dia = fecha.getUTCDay() || 7
+  fecha.setUTCDate(fecha.getUTCDate() + 4 - dia)
+  const inicioAnio = new Date(Date.UTC(fecha.getUTCFullYear(), 0, 1))
+  return Math.ceil(((fecha - inicioAnio) / 86400000 + 1) / 7)
+}
+
+const SEMANA_ACTUAL = semanaIsoActual()
+
 const TREE = [
   { type: 'file', to: '/', label: 'Dashboard', end: true, icon: 'bi-speedometer2' },
   {
@@ -40,7 +51,7 @@ const TREE = [
         children: [
           { type: 'file', to: '/plan', label: 'Resumen', end: true },
           { type: 'file', to: '/plan/ajustes', label: 'Ajustes' },
-          { type: 'file', to: '/plan/semana/34', label: 'Semana 34' },
+          { type: 'file', to: `/plan/semana/${SEMANA_ACTUAL}`, label: `Semana ${SEMANA_ACTUAL} (actual)` },
         ],
       },
       { type: 'file', to: '/evaluacion', label: 'Evaluación' },

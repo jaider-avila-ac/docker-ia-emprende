@@ -6,7 +6,36 @@ import com.iaemprender.backend.apikeys.servicio.ApiKeyService;
 import com.iaemprender.backend.common.excepcion.SolicitudInvalidaException;
 import com.iaemprender.backend.competidores.modelo.Competidor;
 import com.iaemprender.backend.competidores.servicio.CompetidorService;
+import com.iaemprender.backend.common.excepcion.RecursoNoEncontradoException;
+import com.iaemprender.backend.evaluacion.modelo.Evaluacion;
+import com.iaemprender.backend.evaluacion.servicio.EvaluacionService;
+import com.iaemprender.backend.inteligencia.dto.AnalisisResponse;
+import com.iaemprender.backend.inteligencia.dto.BrandingSugerenciaResponse;
+import com.iaemprender.backend.inteligencia.dto.FodaItemRequest;
 import com.iaemprender.backend.inteligencia.dto.FodaItemResponse;
+import com.iaemprender.backend.inteligencia.dto.MetaSmartRequest;
+import com.iaemprender.backend.inteligencia.servicio.cliente.AnalisisGatewayRespuesta;
+import com.iaemprender.backend.inteligencia.servicio.cliente.BrandingGatewayRespuesta;
+import com.iaemprender.backend.inteligencia.servicio.cliente.DatosAsistente;
+import com.iaemprender.backend.inteligencia.servicio.cliente.IniciativasGatewayRespuesta;
+import com.iaemprender.backend.inteligencia.servicio.cliente.PlanGateway;
+import com.iaemprender.backend.inteligencia.servicio.cliente.PlanGatewayRespuesta;
+import com.iaemprender.backend.iniciativas.dto.IniciativaRequest;
+import com.iaemprender.backend.iniciativas.dto.IniciativaResponse;
+import com.iaemprender.backend.iniciativas.modelo.EstadoIniciativa;
+import com.iaemprender.backend.iniciativas.modelo.Iniciativa;
+import com.iaemprender.backend.iniciativas.servicio.IniciativaService;
+import com.iaemprender.backend.plan.dto.PlanAccionRequest;
+import com.iaemprender.backend.plan.dto.PlanAccionResponse;
+import com.iaemprender.backend.plan.dto.PlanSemanalResponse;
+import com.iaemprender.backend.plan.modelo.DiaSemana;
+import com.iaemprender.backend.plan.modelo.PlanSemanal;
+import com.iaemprender.backend.plan.servicio.PlanService;
+import com.iaemprender.backend.resultados.modelo.ResultadoSemanal;
+import com.iaemprender.backend.resultados.servicio.ResultadoSemanalService;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import com.iaemprender.backend.inteligencia.dto.MetaSmartResponse;
 import com.iaemprender.backend.inteligencia.modelo.FodaItem;
 import com.iaemprender.backend.inteligencia.modelo.MetaSmart;
@@ -48,6 +77,10 @@ public class InteligenciaServiceImpl implements InteligenciaService {
   private final CompetidorService competidorService;
   private final ApiKeyService apiKeyService;
   private final IaGatewayCliente iaGatewayCliente;
+  private final IniciativaService iniciativaService;
+  private final PlanService planService;
+  private final EvaluacionService evaluacionService;
+  private final ResultadoSemanalService resultadoSemanalService;
   private final ObjectMapper objectMapper = new ObjectMapper();
 
   public InteligenciaServiceImpl(
@@ -58,7 +91,15 @@ public class InteligenciaServiceImpl implements InteligenciaService {
       OfertaService ofertaService,
       CompetidorService competidorService,
       ApiKeyService apiKeyService,
-      IaGatewayCliente iaGatewayCliente) {
+      IaGatewayCliente iaGatewayCliente,
+      IniciativaService iniciativaService,
+      PlanService planService,
+      EvaluacionService evaluacionService,
+      ResultadoSemanalService resultadoSemanalService) {
+    this.iniciativaService = iniciativaService;
+    this.planService = planService;
+    this.evaluacionService = evaluacionService;
+    this.resultadoSemanalService = resultadoSemanalService;
     this.competidorService = competidorService;
     this.fodaItemRepository = fodaItemRepository;
     this.metaSmartRepository = metaSmartRepository;
@@ -153,6 +194,269 @@ public class InteligenciaServiceImpl implements InteligenciaService {
     return metaSmartRepository.findByNegocioIdOrderByIdAsc(negocio.getId()).stream()
         .map(MetaSmartResponse::desde)
         .toList();
+  }
+
+  @Override
+  @Transactional
+  public FodaItemResponse actualizarFodaItem(Long usuarioId, Long itemId, FodaItemRequest datos) {
+    Negocio negocio = negocioService.obtenerActivo(usuarioId);
+    FodaItem item = fodaItemRepository.findByIdAndNegocioId(itemId, negocio.getId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Elemento del FODA no encontrado."));
+    item.setContenido(datos.contenido().trim());
+    return FodaItemResponse.desde(fodaItemRepository.save(item));
+  }
+
+  @Override
+  @Transactional
+  public void eliminarFodaItem(Long usuarioId, Long itemId) {
+    Negocio negocio = negocioService.obtenerActivo(usuarioId);
+    FodaItem item = fodaItemRepository.findByIdAndNegocioId(itemId, negocio.getId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Elemento del FODA no encontrado."));
+    fodaItemRepository.delete(item);
+  }
+
+  @Override
+  @Transactional
+  public MetaSmartResponse actualizarMeta(Long usuarioId, Long metaId, MetaSmartRequest datos) {
+    Negocio negocio = negocioService.obtenerActivo(usuarioId);
+    MetaSmart meta = metaSmartRepository.findByIdAndNegocioId(metaId, negocio.getId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Meta SMART no encontrada."));
+    meta.setTitulo(datos.titulo().trim());
+    meta.setEspecifico(datos.especifico());
+    meta.setNumeroMeta(datos.numeroMeta());
+    meta.setFechaLimite(datos.fechaLimite());
+    meta.setMedicion(datos.medicion());
+    meta.setPasos(datos.pasos());
+    return MetaSmartResponse.desde(metaSmartRepository.save(meta));
+  }
+
+  @Override
+  @Transactional
+  public void eliminarMeta(Long usuarioId, Long metaId) {
+    Negocio negocio = negocioService.obtenerActivo(usuarioId);
+    MetaSmart meta = metaSmartRepository.findByIdAndNegocioId(metaId, negocio.getId())
+        .orElseThrow(() -> new RecursoNoEncontradoException("Meta SMART no encontrada."));
+    metaSmartRepository.delete(meta);
+  }
+
+  @Override
+  @Transactional
+  public List<IniciativaResponse> generarIniciativas(Long usuarioId) {
+    Negocio negocio = negocioService.obtenerActivo(usuarioId);
+    var contexto = construirContexto(negocio, usuarioId);
+    Map<String, List<String>> foda = fodaPorTipo(negocio.getId());
+    List<String> metas = metasComoTexto(negocio.getId());
+    if (foda.isEmpty() && metas.isEmpty()) {
+      throw new SolicitudInvalidaException(
+          "Genera primero tu FODA o tus metas SMART para que la IA pueda proponer iniciativas.");
+    }
+    List<Iniciativa> existentes = iniciativaService.listarDelNegocioActivo(usuarioId);
+    var datos = new DatosAsistente(
+        foda,
+        metas,
+        aprendizajes(usuarioId, existentes),
+        resultadosComoTexto(usuarioId),
+        existentes.stream().map(Iniciativa::getTitulo).toList(),
+        null);
+
+    List<String> proveedores = proveedoresDisponibles(usuarioId);
+    IniciativasGatewayRespuesta respuesta = generarConRespaldo(
+        usuarioId, proveedores, (proveedor, clave) ->
+            iaGatewayCliente.generarIniciativas(proveedor, clave, contexto, datos));
+
+    return respuesta.iniciativas().stream()
+        .filter(i -> i.titulo() != null && !i.titulo().isBlank())
+        .map(i -> {
+          var request = new IniciativaRequest(
+              recortar(i.titulo(), 255),
+              i.metaTipo(),
+              i.pilar(),
+              null,
+              i.impacto(),
+              i.confianza(),
+              i.esfuerzo(),
+              i.descripcion(),
+              null,
+              null);
+          return IniciativaResponse.desde(iniciativaService.crearGenerada(usuarioId, request, i.iaTip()));
+        })
+        .toList();
+  }
+
+  @Override
+  @Transactional
+  public PlanSemanalResponse generarPlan(Long usuarioId) {
+    Negocio negocio = negocioService.obtenerActivo(usuarioId);
+    var contexto = construirContexto(negocio, usuarioId);
+
+    List<Iniciativa> prioritarias = iniciativaService.listarDelNegocioActivo(usuarioId).stream()
+        .filter(i -> i.getEstado() != EstadoIniciativa.DESCARTADA)
+        .sorted(Comparator.comparingDouble(this::ice).reversed())
+        .limit(6)
+        .toList();
+    if (prioritarias.isEmpty()) {
+      throw new SolicitudInvalidaException(
+          "Primero genera tus iniciativas: el plan semanal se arma a partir de ellas.");
+    }
+
+    PlanSemanal plan = planService.obtenerOCrearSemanaActual(usuarioId);
+    var datos = new DatosAsistente(
+        Map.of(),
+        List.of(),
+        aprendizajes(usuarioId, prioritarias),
+        List.of(),
+        prioritarias.stream().map(this::describirIniciativa).toList(),
+        new PlanGateway(
+            plan.getTiempoDisponible().getValorDb(),
+            plan.getPublicacionesSugeridas() == null ? 0 : plan.getPublicacionesSugeridas(),
+            plan.getHistoriasSugeridas() == null ? 0 : plan.getHistoriasSugeridas(),
+            plan.getVentanaHoraria() == null ? "" : plan.getVentanaHoraria()));
+
+    List<String> proveedores = proveedoresDisponibles(usuarioId);
+    PlanGatewayRespuesta respuesta = generarConRespaldo(
+        usuarioId, proveedores, (proveedor, clave) ->
+            iaGatewayCliente.generarPlan(proveedor, clave, contexto, datos));
+
+    List<PlanAccionRequest> acciones = respuesta.acciones().stream()
+        .filter(a -> a.descripcion() != null && !a.descripcion().isBlank() && diaValido(a.diaSemana()))
+        .map(a -> new PlanAccionRequest(a.diaSemana(), recortar(a.descripcion(), 255)))
+        .toList();
+    if (acciones.isEmpty()) {
+      throw new SolicitudInvalidaException("La IA no devolvió un plan utilizable. Inténtalo de nuevo.");
+    }
+
+    planService.reemplazarAccionesSemanaActual(usuarioId, acciones);
+    var accionesGuardadas =
+        planService.listarAcciones(plan.getId()).stream().map(PlanAccionResponse::desde).toList();
+    return PlanSemanalResponse.desde(plan, accionesGuardadas);
+  }
+
+  @Override
+  public BrandingSugerenciaResponse sugerirBranding(Long usuarioId) {
+    Negocio negocio = negocioService.obtenerActivo(usuarioId);
+    var contexto = construirContexto(negocio, usuarioId);
+    var datos = new DatosAsistente(fodaPorTipo(negocio.getId()), List.of(), List.of(), List.of(), List.of(), null);
+
+    List<String> proveedores = proveedoresDisponibles(usuarioId);
+    BrandingGatewayRespuesta r = generarConRespaldo(
+        usuarioId, proveedores, (proveedor, clave) ->
+            iaGatewayCliente.sugerirBranding(proveedor, clave, contexto, datos));
+
+    List<String> pilares = r.pilares() == null
+        ? List.of()
+        : r.pilares().stream().filter(this::pilarValido).distinct().toList();
+    return new BrandingSugerenciaResponse(
+        recortar(r.tagline(), 255),
+        recortar(r.tono(), 255),
+        pilares,
+        recortar(r.colores(), 255),
+        recortar(r.referenciasEstilo(), 255));
+  }
+
+  @Override
+  public AnalisisResponse analizar(Long usuarioId) {
+    Negocio negocio = negocioService.obtenerActivo(usuarioId);
+    var contexto = construirContexto(negocio, usuarioId);
+    List<Iniciativa> iniciativas = iniciativaService.listarDelNegocioActivo(usuarioId);
+    List<String> aprendizajes = aprendizajes(usuarioId, iniciativas);
+    List<String> resultados = resultadosComoTexto(usuarioId);
+    if (aprendizajes.isEmpty() && resultados.isEmpty()) {
+      throw new SolicitudInvalidaException(
+          "Registra al menos una evaluación o un resultado semanal para que la IA pueda analizarlos.");
+    }
+    var datos = new DatosAsistente(Map.of(), metasComoTexto(negocio.getId()), aprendizajes, resultados, List.of(), null);
+
+    List<String> proveedores = proveedoresDisponibles(usuarioId);
+    AnalisisGatewayRespuesta r = generarConRespaldo(
+        usuarioId, proveedores, (proveedor, clave) ->
+            iaGatewayCliente.analizar(proveedor, clave, contexto, datos));
+    return new AnalisisResponse(
+        r.resumen(),
+        r.queFunciono() == null ? List.of() : r.queFunciono(),
+        r.queCambiar() == null ? List.of() : r.queCambiar(),
+        r.siguientePaso());
+  }
+
+  private Map<String, List<String>> fodaPorTipo(Long negocioId) {
+    Map<String, List<String>> resultado = new LinkedHashMap<>();
+    for (FodaItem item : fodaItemRepository.findByNegocioIdOrderByTipoAscIdAsc(negocioId)) {
+      String clave = switch (item.getTipo()) {
+        case FORTALEZA -> "fortalezas";
+        case OPORTUNIDAD -> "oportunidades";
+        case DEBILIDAD -> "debilidades";
+        case AMENAZA -> "amenazas";
+      };
+      resultado.computeIfAbsent(clave, k -> new ArrayList<>()).add(item.getContenido());
+    }
+    return resultado;
+  }
+
+  private List<String> metasComoTexto(Long negocioId) {
+    return metaSmartRepository.findByNegocioIdOrderByIdAsc(negocioId).stream()
+        .map(m -> m.getTitulo() + (m.getNumeroMeta() == null ? "" : " (meta: " + m.getNumeroMeta() + ")"))
+        .toList();
+  }
+
+  private List<String> aprendizajes(Long usuarioId, List<Iniciativa> iniciativas) {
+    Map<Long, String> titulos = iniciativaService.listarDelNegocioActivo(usuarioId).stream()
+        .collect(Collectors.toMap(Iniciativa::getId, Iniciativa::getTitulo, (a, b) -> a));
+    List<Evaluacion> evaluaciones = evaluacionService.listarDelNegocioActivo(usuarioId);
+    return evaluaciones.stream()
+        .skip(Math.max(0, evaluaciones.size() - 10))
+        .map(e -> {
+          String titulo = titulos.getOrDefault(e.getIniciativaId(), "Iniciativa " + e.getIniciativaId());
+          String comentario =
+              e.getComentarios() == null || e.getComentarios().isBlank() ? "" : ". Comentario: " + e.getComentarios();
+          return titulo + ": se logró " + e.getSeLogro().getValorDb() + ", dificultad "
+              + e.getDificultad().getValorDb() + ", repetiría " + e.getRepetiria().getValorDb() + comentario;
+        })
+        .toList();
+  }
+
+  private List<String> resultadosComoTexto(Long usuarioId) {
+    List<ResultadoSemanal> resultados = resultadoSemanalService.listarDelNegocioActivo(usuarioId);
+    return resultados.stream()
+        .skip(Math.max(0, resultados.size() - 8))
+        .map(r -> "Semana " + r.getSemanaNumero() + "/" + r.getAnio() + ": ingresos aprox. $" + r.getIngresosAprox()
+            + (r.getClientesAprox() == null ? "" : ", clientes aprox. " + r.getClientesAprox()))
+        .toList();
+  }
+
+  private String describirIniciativa(Iniciativa i) {
+    String detalle = i.getDescripcion() == null || i.getDescripcion().isBlank() ? "" : ": " + i.getDescripcion();
+    return i.getTitulo() + " [" + i.getEstado().getValorDb() + "]" + detalle;
+  }
+
+  private double ice(Iniciativa i) {
+    return i.getEsfuerzo() == null || i.getEsfuerzo() == 0
+        ? 0
+        : i.getImpacto() * i.getConfianza() / (double) i.getEsfuerzo();
+  }
+
+  private boolean diaValido(String dia) {
+    try {
+      DiaSemana.desdeValorDb(dia);
+      return true;
+    } catch (IllegalArgumentException | NullPointerException ex) {
+      return false;
+    }
+  }
+
+  private boolean pilarValido(String pilar) {
+    try {
+      Pilar.desdeValorDb(pilar);
+      return true;
+    } catch (IllegalArgumentException | NullPointerException ex) {
+      return false;
+    }
+  }
+
+  private String recortar(String texto, int maximo) {
+    if (texto == null) {
+      return null;
+    }
+    String limpio = texto.trim();
+    return limpio.length() <= maximo ? limpio : limpio.substring(0, maximo);
   }
 
   private ContextoNegocioGateway construirContexto(Negocio negocio, Long usuarioId) {

@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from app.routers import contexto, foda, smart
+from app.routers import asistente, contexto, foda, smart
 
 app = FastAPI(
     title="IAEmprender · IA Gateway",
@@ -16,6 +16,7 @@ app = FastAPI(
 app.include_router(foda.router)
 app.include_router(smart.router)
 app.include_router(contexto.router)
+app.include_router(asistente.router)
 
 @app.get("/salud")
 def salud() -> dict:

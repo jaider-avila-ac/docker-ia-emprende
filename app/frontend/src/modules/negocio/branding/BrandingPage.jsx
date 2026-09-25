@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react'
 import PageHeader from '../../../components/ui/PageHeader'
 import Card from '../../../components/ui/Card'
 import Button from '../../../components/ui/Button'
-import Badge from '../../../components/ui/Badge'
+import { AiBadge } from '../../../components/ui/Badge'
+import ErrorIa from '../../../components/ui/ErrorIa'
 import NoteBox from '../../../components/ui/NoteBox'
 import { Input, Checkbox } from '../../../components/ui/Field'
 import { useSavedFeedback } from '../../../hooks/useSavedFeedback'
 import { useBusiness } from '../../../context/BusinessContext'
+import { inteligenciaApi } from '../../../api/inteligencia'
 import { ApiError } from '../../../api/client'
 
 const PILARES = ['Educativo', 'Oferta', 'Prueba social', 'Interacción', 'Servicio']
@@ -24,6 +26,8 @@ export default function BrandingPage() {
   const [form, setForm] = useState(() => formDesde(business))
   const [errorGeneral, setErrorGeneral] = useState('')
   const { saving, saved, run } = useSavedFeedback()
+  const [sugiriendo, setSugiriendo] = useState(false)
+  const [sugerido, setSugerido] = useState(false)
 
   useEffect(() => setForm(formDesde(business)), [business])
 
@@ -32,6 +36,26 @@ export default function BrandingPage() {
       ...prev,
       pilares: prev.pilares.includes(pilar) ? prev.pilares.filter((p) => p !== pilar) : [...prev.pilares, pilar],
     }))
+
+  const sugerir = async () => {
+    setErrorGeneral('')
+    setSugiriendo(true)
+    try {
+      const s = await inteligenciaApi.sugerirBranding()
+      setForm({
+        tagline: s.tagline || '',
+        tono: s.tono || '',
+        colores: s.colores || '',
+        referenciasEstilo: s.referenciasEstilo || '',
+        pilares: s.pilares || [],
+      })
+      setSugerido(true)
+    } catch (err) {
+      setErrorGeneral(err instanceof ApiError ? err.message : 'No se pudo generar la sugerencia.')
+    } finally {
+      setSugiriendo(false)
+    }
+  }
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -55,11 +79,19 @@ export default function BrandingPage() {
     <>
       <PageHeader
         title="Branding"
-        description={<Badge variant="sky">Usuario escribe</Badge>}
-      />
+        description={<AiBadge />}
+      >
+        <Button variant="success" loading={sugiriendo} onClick={sugerir}>
+          {sugiriendo ? 'Pensando…' : 'Sugerir con IA'}
+        </Button>
+      </PageHeader>
 
-      {errorGeneral && (
-        <p className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{errorGeneral}</p>
+      <ErrorIa mensaje={errorGeneral} />
+
+      {sugerido && (
+        <NoteBox variant="sky">
+          La IA llenó el formulario con su propuesta. Cámbiala si quieres y pulsa Guardar; todavía no se ha guardado.
+        </NoteBox>
       )}
 
       <Card as="form" onSubmit={onSubmit} className="space-y-3 text-sm max-w-2xl">
@@ -102,8 +134,9 @@ export default function BrandingPage() {
       </Card>
 
       <NoteBox>
-        Esto es lo que le da tono a tu FODA y a tus metas SMART generadas por IA — mientras más claro lo dejes aquí,
-        más ajustado sale lo que la IA propone en <a href="/inteligencia" className="underline">Inteligencia</a>.
+        Esto le da el tono a todo lo que la IA genera para ti en{' '}
+        <a href="/inteligencia" className="underline">Inteligencia</a>. Pide una propuesta con "Sugerir con IA" y
+        ajústala, o déjala tal cual.
       </NoteBox>
     </>
   )

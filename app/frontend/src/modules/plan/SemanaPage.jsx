@@ -4,21 +4,77 @@ import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
 import NoteBox from '../../components/ui/NoteBox'
 import EmptyState from '../../components/ui/EmptyState'
+import ErrorIa from '../../components/ui/ErrorIa'
 import { Input, Select } from '../../components/ui/Field'
 import { planApi } from '../../api/plan'
+import { inteligenciaApi } from '../../api/inteligencia'
 import { ApiError } from '../../api/client'
 
 const DIAS = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+
+function Accion({ accion, onGuardar, onQuitar }) {
+  const [editando, setEditando] = useState(false)
+  const [dia, setDia] = useState(accion.diaSemana)
+  const [texto, setTexto] = useState(accion.descripcion)
+  const [guardando, setGuardando] = useState(false)
+
+  const guardar = async () => {
+    if (!texto.trim()) return
+    setGuardando(true)
+    const ok = await onGuardar(accion.id, { diaSemana: dia, descripcion: texto.trim() })
+    setGuardando(false)
+    if (ok) setEditando(false)
+  }
+
+  if (editando) {
+    return (
+      <li className="space-y-2">
+        <Select focus="sky" value={dia} onChange={(e) => setDia(e.target.value)}>
+          {DIAS.map((d) => <option key={d}>{d}</option>)}
+        </Select>
+        <Input focus="sky" value={texto} onChange={(e) => setTexto(e.target.value)} />
+        <div className="flex gap-2">
+          <Button variant="success" size="xs" loading={guardando} onClick={guardar}>Guardar</Button>
+          <Button
+            variant="subtle"
+            size="xs"
+            onClick={() => {
+              setDia(accion.diaSemana)
+              setTexto(accion.descripcion)
+              setEditando(false)
+            }}
+          >
+            Cancelar
+          </Button>
+        </div>
+      </li>
+    )
+  }
+
+  return (
+    <li className="flex items-start justify-between gap-2">
+      <span>• {accion.descripcion}</span>
+      <span className="flex gap-2 shrink-0">
+        <button type="button" onClick={() => setEditando(true)} className="text-[11px] text-sky-700 hover:underline">
+          Editar
+        </button>
+        <button type="button" onClick={() => onQuitar(accion.id)} className="text-[11px] text-rose-600 hover:underline">
+          Quitar
+        </button>
+      </span>
+    </li>
+  )
+}
 
 export default function SemanaPage() {
   const { numero } = useParams()
   const [plan, setPlan] = useState(null)
   const [existe, setExiste] = useState(true)
   const [cargando, setCargando] = useState(true)
+  const [generando, setGenerando] = useState(false)
   const [error, setError] = useState('')
-  const [nuevaDescripcion, setNuevaDescripcion] = useState('')
-  const [nuevoDia, setNuevoDia] = useState('Lunes')
-  const [agregando, setAgregando] = useState(false)
+
+  const mensajeDe = (err, porDefecto) => (err instanceof ApiError ? err.message : porDefecto)
 
   const cargar = () => {
     setCargando(true)
@@ -30,34 +86,50 @@ export default function SemanaPage() {
       })
       .catch((err) => {
         if (err instanceof ApiError && err.estado === 404) setExiste(false)
-        else setError(err instanceof ApiError ? err.message : 'No se pudo cargar la semana.')
+        else setError(mensajeDe(err, 'No se pudo cargar la semana.'))
       })
       .finally(() => setCargando(false))
   }
 
   useEffect(cargar, [numero])
 
-  const agregarAccion = async (e) => {
-    e.preventDefault()
-    if (!nuevaDescripcion.trim()) return
-    setAgregando(true)
+  const generar = async () => {
+    setError('')
+    setGenerando(true)
     try {
-      await planApi.agregarAccion(numero, { diaSemana: nuevoDia, descripcion: nuevaDescripcion.trim() })
-      setNuevaDescripcion('')
-      cargar()
+      const generado = await inteligenciaApi.generarPlan()
+      if (String(generado.semanaNumero) === String(numero)) {
+        setPlan(generado)
+        setExiste(true)
+      } else {
+        window.location.assign(`/plan/semana/${generado.semanaNumero}`)
+      }
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo agregar la acción.')
+      setError(mensajeDe(err, 'No se pudo generar el plan.'))
     } finally {
-      setAgregando(false)
+      setGenerando(false)
     }
   }
 
-  const eliminarAccion = async (id) => {
+  const guardarAccion = async (id, datos) => {
+    setError('')
+    try {
+      await planApi.actualizarAccion(id, datos)
+      cargar()
+      return true
+    } catch (err) {
+      setError(mensajeDe(err, 'No se pudo guardar el cambio.'))
+      return false
+    }
+  }
+
+  const quitarAccion = async (id) => {
+    setError('')
     try {
       await planApi.eliminarAccion(id)
       cargar()
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo eliminar la acción.')
+      setError(mensajeDe(err, 'No se pudo quitar la acción.'))
     }
   }
 
@@ -70,22 +142,9 @@ export default function SemanaPage() {
         <Card className="mt-3">
           <EmptyState
             title={`Todavía no hay plan para la semana ${numero}`}
-            description="Ve al plan y ajusta la cadencia para crear esta semana, o agrega una acción abajo para crearla ahora mismo."
+            description="Vuelve al plan y genera el de la semana vigente con IA."
+            action={<Button to="/plan" variant="success">Ir al plan</Button>}
           />
-        </Card>
-        <Card className="mt-3">
-          <form onSubmit={agregarAccion} className="flex flex-wrap items-end gap-2 text-sm">
-            <Select value={nuevoDia} onChange={(e) => setNuevoDia(e.target.value)}>
-              {DIAS.map((d) => <option key={d}>{d}</option>)}
-            </Select>
-            <Input
-              className="flex-1 min-w-[200px]"
-              placeholder="Ej.: Post con el menú del día"
-              value={nuevaDescripcion}
-              onChange={(e) => setNuevaDescripcion(e.target.value)}
-            />
-            <Button variant="success" type="submit" loading={agregando}>Agregar y crear semana</Button>
-          </form>
         </Card>
       </>
     )
@@ -93,34 +152,36 @@ export default function SemanaPage() {
 
   return (
     <>
-      <header className="flex items-center justify-between">
+      <header className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <Link to="/plan" className="text-xs text-sky-700 hover:underline">← Volver al plan</Link>
           <h1 className="text-lg font-semibold mt-1">Semana {plan.semanaNumero} · {plan.anio}</h1>
           <p className="text-xs text-gray-500">Ventana recomendada: {plan.ventanaHoraria || '—'}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
+          <Button variant="danger" loading={generando} onClick={generar}>
+            {generando ? 'Generando…' : 'Regenerar con IA'}
+          </Button>
           <Button to="/iniciativas" variant="warning">Ir a Iniciativas</Button>
           <Button to="/evaluacion" variant="success">Evaluar semana</Button>
         </div>
       </header>
 
-      {error && <p className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{error}</p>}
+      <ErrorIa mensaje={error} />
 
-      <Card>
-        <form onSubmit={agregarAccion} className="flex flex-wrap items-end gap-2 text-sm">
-          <Select value={nuevoDia} onChange={(e) => setNuevoDia(e.target.value)}>
-            {DIAS.map((d) => <option key={d}>{d}</option>)}
-          </Select>
-          <Input
-            className="flex-1 min-w-[200px]"
-            placeholder="Ej.: Post con el menú del día"
-            value={nuevaDescripcion}
-            onChange={(e) => setNuevaDescripcion(e.target.value)}
+      {plan.acciones.length === 0 && (
+        <Card>
+          <EmptyState
+            title="Esta semana aún no tiene acciones"
+            description="La IA las arma a partir de tus iniciativas priorizadas."
+            action={
+              <Button variant="success" loading={generando} onClick={generar}>
+                {generando ? 'Generando…' : 'Generar plan con IA'}
+              </Button>
+            }
           />
-          <Button variant="success" type="submit" loading={agregando}>Agregar acción</Button>
-        </form>
-      </Card>
+        </Card>
+      )}
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {[DIAS.slice(0, 4), DIAS.slice(4)].map((columna, i) => (
@@ -131,20 +192,11 @@ export default function SemanaPage() {
                 <Card key={dia} as="article" className="text-sm">
                   <h2 className="text-base font-semibold">{dia}</h2>
                   {acciones.length === 0 ? (
-                    <p className="text-gray-400 mt-2 text-xs">Sin acciones todavía.</p>
+                    <p className="text-gray-400 mt-2 text-xs">Sin acciones.</p>
                   ) : (
-                    <ul className="mt-2 text-gray-700 space-y-1">
+                    <ul className="mt-2 text-gray-700 space-y-2">
                       {acciones.map((a) => (
-                        <li key={a.id} className="flex items-center justify-between gap-2">
-                          <span>• {a.descripcion}</span>
-                          <button
-                            type="button"
-                            onClick={() => eliminarAccion(a.id)}
-                            className="text-[11px] text-rose-600 hover:underline shrink-0"
-                          >
-                            Eliminar
-                          </button>
-                        </li>
+                        <Accion key={a.id} accion={a} onGuardar={guardarAccion} onQuitar={quitarAccion} />
                       ))}
                     </ul>
                   )}
@@ -156,9 +208,10 @@ export default function SemanaPage() {
       </section>
 
       <NoteBox>
-        <strong>Nota:</strong> El plan semanal se arma a partir de las{' '}
-        <a href="/iniciativas" className="text-amber-700 underline">iniciativas priorizadas</a>. Ajusta el plan según
-        disponibilidad y resultados.
+        La IA armó este plan con tus{' '}
+        <a href="/iniciativas" className="text-amber-700 underline">iniciativas priorizadas</a>. Edita las acciones o
+        cambia su día, quita las que no quieras, o déjalo tal cual. "Regenerar con IA" reemplaza todas las acciones de
+        la semana.
       </NoteBox>
     </>
   )

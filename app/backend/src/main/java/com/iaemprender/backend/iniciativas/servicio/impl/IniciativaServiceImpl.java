@@ -41,6 +41,18 @@ public class IniciativaServiceImpl implements IniciativaService {
   }
 
   @Override
+  @Transactional
+  public Iniciativa crearGenerada(Long usuarioId, IniciativaRequest datos, String iaTip) {
+    Negocio negocioActivo = negocioService.obtenerActivo(usuarioId);
+    Iniciativa iniciativa = new Iniciativa();
+    iniciativa.setNegocioId(negocioActivo.getId());
+    aplicarDatos(iniciativa, datos, usuarioId);
+    iniciativa.setGeneradaPorIa(true);
+    iniciativa.setIaTip(iaTip);
+    return iniciativaRepository.save(iniciativa);
+  }
+
+  @Override
   @Transactional(readOnly = true)
   public List<Iniciativa> listarDelNegocioActivo(Long usuarioId) {
     Negocio negocioActivo = negocioService.obtenerActivo(usuarioId);

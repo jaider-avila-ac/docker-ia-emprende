@@ -8,5 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PlanAccionRepository extends JpaRepository<PlanAccion, Long> {
   List<PlanAccion> findByPlanSemanalIdOrderByIdAsc(Long planSemanalId);
 
+  void deleteByPlanSemanalId(Long planSemanalId);
+
   Optional<PlanAccion> findByIdAndPlanSemanal_NegocioId(Long id, Long negocioId);
 }

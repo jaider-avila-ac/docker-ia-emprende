@@ -2,13 +2,15 @@ import { useEffect, useState } from 'react'
 import PageHeader from '../../components/ui/PageHeader'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
-import { UserBadge } from '../../components/ui/Badge'
+import { AiBadge } from '../../components/ui/Badge'
+import ErrorIa from '../../components/ui/ErrorIa'
 import NoteBox from '../../components/ui/NoteBox'
 import DataTable, { Td } from '../../components/ui/DataTable'
 import EmptyState from '../../components/ui/EmptyState'
 import { Field, Select, Textarea, Input } from '../../components/ui/Field'
 import { iniciativasApi } from '../../api/iniciativas'
 import { evaluacionesApi } from '../../api/evaluaciones'
+import { inteligenciaApi } from '../../api/inteligencia'
 import { ApiError } from '../../api/client'
 
 const emptyForm = { iniciativaId: '', semanaNumero: '', seLogro: 'Sí', dificultad: 'Baja', repetiria: 'Sí', comentarios: '' }
@@ -20,6 +22,8 @@ export default function EvaluacionPage() {
   const [enviando, setEnviando] = useState(false)
   const [error, setError] = useState('')
   const [form, setForm] = useState(emptyForm)
+  const [analisis, setAnalisis] = useState(null)
+  const [analizando, setAnalizando] = useState(false)
 
   const cargar = () => {
     setCargando(true)
@@ -56,6 +60,18 @@ export default function EvaluacionPage() {
     }
   }
 
+  const analizar = async () => {
+    setError('')
+    setAnalizando(true)
+    try {
+      setAnalisis(await inteligenciaApi.analizar())
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'No se pudo generar el análisis.')
+    } finally {
+      setAnalizando(false)
+    }
+  }
+
   const eliminar = async (id) => {
     try {
       await evaluacionesApi.eliminar(id)
@@ -76,18 +92,18 @@ export default function EvaluacionPage() {
         description={
           <>
             No hace falta contabilidad detallada; solo cómo te fue en general (los números van en{' '}
-            <a href="/negocio/resultados" className="underline">Resultados</a>). <UserBadge className="ml-1" />
+            <a href="/negocio/resultados" className="underline">Resultados</a>). <AiBadge className="ml-1" />
           </>
         }
       />
 
-      {error && <p className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{error}</p>}
+      <ErrorIa mensaje={error} />
 
       {iniciativas.length === 0 ? (
         <Card>
           <EmptyState
             title="Aún no tienes iniciativas para evaluar"
-            description="Crea al menos una en Iniciativas antes de registrar una evaluación."
+            description="Genera tus iniciativas con IA y pruébalas; después vuelve aquí a contar cómo te fue."
             action={<Button to="/iniciativas" variant="warning">Ir a Iniciativas</Button>}
           />
         </Card>
@@ -156,6 +172,44 @@ export default function EvaluacionPage() {
               </tr>
             ))}
           </DataTable>
+        )}
+      </Card>
+
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div>
+            <h2 className="text-base font-semibold">Análisis de la IA</h2>
+            <p className="text-xs text-gray-500">
+              La IA lee tus evaluaciones y tus resultados semanales y te dice qué funcionó y qué cambiar.
+            </p>
+          </div>
+          <Button variant="success" loading={analizando} onClick={analizar}>
+            {analizando ? 'Analizando…' : analisis ? 'Analizar de nuevo' : 'Analizar con IA'}
+          </Button>
+        </div>
+
+        {analisis && (
+          <div className="mt-3 text-sm space-y-3">
+            <p className="text-gray-800">{analisis.resumen}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3">
+                <p className="text-xs font-semibold text-emerald-800">Lo que funcionó</p>
+                <ul className="list-disc pl-5 mt-1 text-gray-700 space-y-1">
+                  {analisis.queFunciono.map((t, i) => <li key={i}>{t}</li>)}
+                </ul>
+              </div>
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                <p className="text-xs font-semibold text-amber-800">Lo que conviene cambiar</p>
+                <ul className="list-disc pl-5 mt-1 text-gray-700 space-y-1">
+                  {analisis.queCambiar.map((t, i) => <li key={i}>{t}</li>)}
+                </ul>
+              </div>
+            </div>
+            <p className="bg-sky-50 border border-sky-200 rounded-xl p-3 text-gray-800">
+              <span className="font-semibold text-sky-800">Siguiente paso: </span>
+              {analisis.siguientePaso}
+            </p>
+          </div>
         )}
       </Card>
 

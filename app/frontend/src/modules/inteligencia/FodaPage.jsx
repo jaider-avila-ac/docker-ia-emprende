@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import PageHeader from '../../components/ui/PageHeader'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
-import { UserBadge, AiBadge } from '../../components/ui/Badge'
+import { AiBadge } from '../../components/ui/Badge'
 import NoteBox from '../../components/ui/NoteBox'
 import EmptyState from '../../components/ui/EmptyState'
+import ErrorIa from '../../components/ui/ErrorIa'
+import { Textarea } from '../../components/ui/Field'
 import { inteligenciaApi } from '../../api/inteligencia'
 import { ApiError } from '../../api/client'
 
@@ -15,33 +17,102 @@ const CUADRANTES = [
   { tipo: 'Amenaza', titulo: 'Amenazas', color: 'text-rose-700' },
 ]
 
+function ItemFoda({ item, onGuardar, onQuitar }) {
+  const [editando, setEditando] = useState(false)
+  const [texto, setTexto] = useState(item.contenido)
+  const [guardando, setGuardando] = useState(false)
+
+  const guardar = async () => {
+    if (!texto.trim()) return
+    setGuardando(true)
+    const ok = await onGuardar(item.id, texto.trim())
+    setGuardando(false)
+    if (ok) setEditando(false)
+  }
+
+  if (editando) {
+    return (
+      <li className="bg-white border border-sky-300 rounded-lg p-2 space-y-2">
+        <Textarea focus="sky" rows={3} value={texto} onChange={(e) => setTexto(e.target.value)} />
+        <div className="flex gap-2">
+          <Button variant="success" size="xs" loading={guardando} onClick={guardar}>Guardar</Button>
+          <Button
+            variant="subtle"
+            size="xs"
+            onClick={() => {
+              setTexto(item.contenido)
+              setEditando(false)
+            }}
+          >
+            Cancelar
+          </Button>
+        </div>
+      </li>
+    )
+  }
+
+  return (
+    <li className="bg-gray-50 border border-gray-200 rounded-lg p-2 text-gray-800">
+      <p>{item.contenido}</p>
+      <div className="flex gap-3 mt-1">
+        <button type="button" onClick={() => setEditando(true)} className="text-[11px] text-sky-700 hover:underline">
+          Editar
+        </button>
+        <button type="button" onClick={() => onQuitar(item.id)} className="text-[11px] text-rose-600 hover:underline">
+          Quitar
+        </button>
+      </div>
+    </li>
+  )
+}
+
 export default function FodaPage() {
   const [items, setItems] = useState([])
   const [cargando, setCargando] = useState(true)
   const [generando, setGenerando] = useState(false)
   const [error, setError] = useState('')
 
-  const cargar = () => {
-    setCargando(true)
+  const mensajeDe = (err, porDefecto) => (err instanceof ApiError ? err.message : porDefecto)
+
+  useEffect(() => {
     inteligenciaApi
       .listarFoda()
       .then(setItems)
-      .catch((err) => setError(err instanceof ApiError ? err.message : 'No se pudo cargar el FODA.'))
+      .catch((err) => setError(mensajeDe(err, 'No se pudo cargar el FODA.')))
       .finally(() => setCargando(false))
-  }
-
-  useEffect(cargar, [])
+  }, [])
 
   const generar = async () => {
     setError('')
     setGenerando(true)
     try {
-      const nuevos = await inteligenciaApi.generarFoda()
-      setItems(nuevos)
+      setItems(await inteligenciaApi.generarFoda())
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo generar el FODA.')
+      setError(mensajeDe(err, 'No se pudo generar el FODA.'))
     } finally {
       setGenerando(false)
+    }
+  }
+
+  const guardar = async (id, contenido) => {
+    setError('')
+    try {
+      const actualizado = await inteligenciaApi.actualizarFoda(id, contenido)
+      setItems((prev) => prev.map((i) => (i.id === id ? actualizado : i)))
+      return true
+    } catch (err) {
+      setError(mensajeDe(err, 'No se pudo guardar el cambio.'))
+      return false
+    }
+  }
+
+  const quitar = async (id) => {
+    setError('')
+    try {
+      await inteligenciaApi.eliminarFoda(id)
+      setItems((prev) => prev.filter((i) => i.id !== id))
+    } catch (err) {
+      setError(mensajeDe(err, 'No se pudo quitar el elemento.'))
     }
   }
 
@@ -49,24 +120,10 @@ export default function FodaPage() {
     <>
       <PageHeader
         title="FODA · ¿Qué tienes a favor y qué te frena en digital?"
-        description={
-          <>
-            <UserBadge /> · <AiBadge className="ml-1" />
-          </>
-        }
+        description={<AiBadge />}
       />
 
-      {error && (
-        <p className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">
-          {error}
-          {error.includes('clave de IA') && (
-            <>
-              {' '}
-              <a href="/configuracion" className="underline font-medium">Ir a Configuración →</a>
-            </>
-          )}
-        </p>
-      )}
+      <ErrorIa mensaje={error} />
 
       {cargando ? (
         <p className="text-sm text-gray-500">Cargando…</p>
@@ -74,7 +131,7 @@ export default function FodaPage() {
         <Card>
           <EmptyState
             title="Todavía no has generado tu FODA"
-            description="La IA lo arma a partir de los Datos del negocio que ya guardaste. La primera vez puede tardar hasta un minuto."
+            description="La IA lo arma a partir de los datos de tu negocio, tus ofertas, competidores y branding. Después puedes editar lo que quieras. La primera vez puede tardar hasta un minuto."
             action={
               <Button variant="success" loading={generando} onClick={generar}>
                 {generando ? 'Generando… (puede tardar hasta 1 min)' : 'Generar FODA con IA'}
@@ -92,9 +149,7 @@ export default function FodaPage() {
                   {items
                     .filter((i) => i.tipo === c.tipo)
                     .map((i) => (
-                      <li key={i.id} className="bg-gray-50 border border-gray-200 rounded-lg p-2 text-gray-800">
-                        {i.contenido}
-                      </li>
+                      <ItemFoda key={i.id} item={i} onGuardar={guardar} onQuitar={quitar} />
                     ))}
                 </ul>
               </Card>
@@ -112,9 +167,8 @@ export default function FodaPage() {
           </div>
 
           <NoteBox>
-            <strong>Nota:</strong> Este análisis FODA fue <span className="text-emerald-700">generado con IA</span> en
-            base a los <span className="text-sky-700">datos del negocio</span>. Si nada cambió desde la última vez,
-            "Generar de nuevo" no vuelve a gastar una llamada real — te devuelve lo mismo al instante.
+            La IA generó este análisis. Edita o quita lo que no encaje contigo, o déjalo tal cual. Ojo: si pulsas
+            "Generar de nuevo" y tus datos cambiaron, se reemplaza todo, incluidas tus ediciones.
           </NoteBox>
         </>
       )}

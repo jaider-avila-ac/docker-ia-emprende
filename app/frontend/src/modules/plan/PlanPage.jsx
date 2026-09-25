@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import PageHeader from '../../components/ui/PageHeader'
 import Card from '../../components/ui/Card'
 import Button from '../../components/ui/Button'
@@ -6,10 +7,15 @@ import StatTile from '../../components/ui/StatTile'
 import NoteBox from '../../components/ui/NoteBox'
 import { ESTADO_COLOR } from '../iniciativas/data'
 import { iniciativasApi } from '../../api/iniciativas'
+import ErrorIa from '../../components/ui/ErrorIa'
+import { AiBadge } from '../../components/ui/Badge'
 import { planApi } from '../../api/plan'
+import { inteligenciaApi } from '../../api/inteligencia'
 import { ApiError } from '../../api/client'
 
 export default function PlanPage() {
+  const navigate = useNavigate()
+  const [generando, setGenerando] = useState(false)
   const [plan, setPlan] = useState(null)
   const [iniciativas, setIniciativas] = useState([])
   const [cargando, setCargando] = useState(true)
@@ -26,19 +32,34 @@ export default function PlanPage() {
       .finally(() => setCargando(false))
   }, [])
 
+  const generarPlan = async () => {
+    setError('')
+    setGenerando(true)
+    try {
+      const generado = await inteligenciaApi.generarPlan()
+      navigate(`/plan/semana/${generado.semanaNumero}`)
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'No se pudo generar el plan.')
+      setGenerando(false)
+    }
+  }
+
   const focoSemana = iniciativas.filter((i) => ['En prueba', 'Aprobada'].includes(i.estado))
 
   if (cargando) return <p className="text-sm text-gray-500">Cargando…</p>
 
   return (
     <>
-      <PageHeader title="Plan semanal" description="Tu agenda operativa derivada de las iniciativas priorizadas.">
+      <PageHeader title="Plan semanal" description={<AiBadge />}>
+        <Button variant="success" loading={generando} onClick={generarPlan}>
+          {generando ? 'Generando… (puede tardar hasta 1 min)' : 'Generar plan de la semana con IA'}
+        </Button>
         <Button to="/iniciativas" variant="warning">Ir a Iniciativas</Button>
         <Button to="/plan/ajustes" variant="neutral">Ajustes del plan</Button>
         {plan && <Button to={`/plan/semana/${plan.semanaNumero}`} variant="primary">Ver semana {plan.semanaNumero}</Button>}
       </PageHeader>
 
-      {error && <p className="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">{error}</p>}
+      <ErrorIa mensaje={error} />
 
       {plan && (
         <section className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -77,9 +98,9 @@ export default function PlanPage() {
       </section>
 
       <NoteBox>
-        <strong>Nota:</strong> El plan semanal se arma a partir de tus{' '}
-        <a className="text-amber-700 underline" href="/iniciativas">iniciativas priorizadas</a>. Revisa las
-        iniciativas, confirma estado y luego distribuye acciones en la semana.
+        La IA arma el plan de la semana a partir de tus{' '}
+        <a className="text-amber-700 underline" href="/iniciativas">iniciativas priorizadas</a> y de lo que aprendiste
+        en tus evaluaciones. Después puedes editar o quitar las acciones, o dejarlas tal cual.
       </NoteBox>
     </>
   )

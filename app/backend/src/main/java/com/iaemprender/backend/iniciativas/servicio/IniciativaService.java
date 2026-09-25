@@ -7,6 +7,8 @@ import java.util.List;
 public interface IniciativaService {
   Iniciativa crear(Long usuarioId, IniciativaRequest datos);
 
+  Iniciativa crearGenerada(Long usuarioId, IniciativaRequest datos, String iaTip);
+
   List<Iniciativa> listarDelNegocioActivo(Long usuarioId);
 
   Iniciativa actualizar(Long usuarioId, Long iniciativaId, IniciativaRequest datos);

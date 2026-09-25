@@ -27,7 +27,7 @@ export function UserBadge(props) {
 export function AiBadge(props) {
   return (
     <Badge variant="emerald" {...props}>
-      Generado por IA (demo)
+      Generado por IA
     </Badge>
   )
 }

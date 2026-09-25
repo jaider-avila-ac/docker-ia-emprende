@@ -1,6 +1,9 @@
 from datetime import date, timedelta
 
+from pydantic import ValidationError
+
 from app import config
+from app.excepciones import RespuestaInvalidaError
 from app.modelos.contexto import ContextoNegocio
 from app.modelos.respuestas import FodaRespuesta, MetaSmartContenido, SmartRespuesta, SmartRespuestaIA
 from app.prompts.foda import construir_prompt_foda
@@ -59,3 +62,14 @@ def generar_smart(proveedor: str, clave_api: str, contexto: ContextoNegocio) -> 
         for meta in smart_ia.metas
     ]
     return SmartRespuesta(metas=metas), tokens_prompt
+
+
+def generar_con_prompt(solicitud, constructor_prompt, modelo_respuesta):
+    cliente = _obtener_proveedor(solicitud.proveedor)
+    contexto_recortado = recortar_contexto(solicitud.negocio)
+    prompt = constructor_prompt(solicitud, contexto_recortado)
+    datos = cliente.generar_json(prompt, solicitud.clave_api)
+    try:
+        return modelo_respuesta.model_validate(datos)
+    except ValidationError as ex:
+        raise RespuestaInvalidaError(f"La IA devolvio un formato inesperado: {ex.error_count()} errores") from ex
