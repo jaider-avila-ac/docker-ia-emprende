@@ -9,12 +9,12 @@ import { apikeysApi } from '../../api/apikeys'
 import { ApiError } from '../../api/client'
 
 const PROVEEDORES = [
-  { codigo: 'openai', nombre: 'OpenAI' },
-  { codigo: 'gemini', nombre: 'Google Gemini' },
-  { codigo: 'deepseek', nombre: 'DeepSeek' },
+  { codigo: 'openai', nombre: 'OpenAI', urlClave: 'https://platform.openai.com/api-keys' },
+  { codigo: 'gemini', nombre: 'Google Gemini', urlClave: 'https://aistudio.google.com/app/apikey' },
+  { codigo: 'deepseek', nombre: 'DeepSeek', urlClave: 'https://platform.deepseek.com/api_keys' },
 ]
 
-function TarjetaProveedor({ codigo, nombre, estado, onGuardado, onEliminado }) {
+function TarjetaProveedor({ codigo, nombre, urlClave, estado, onGuardado, onEliminado }) {
   const [clave, setClave] = useState('')
   const [guardando, setGuardando] = useState(false)
   const [eliminando, setEliminando] = useState(false)
@@ -74,6 +74,16 @@ function TarjetaProveedor({ codigo, nombre, estado, onGuardado, onEliminado }) {
       ) : (
         <p className="text-xs text-gray-500 mt-1">Sin configurar todavía.</p>
       )}
+
+      <a
+        href={urlClave}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 text-xs text-sky-700 hover:underline mt-2"
+      >
+        <i className="bi bi-box-arrow-up-right" aria-hidden="true" />
+        Conseguir mi clave de {nombre}
+      </a>
 
       {error && <p className="text-xs text-rose-700 mt-2">{error}</p>}
 
@@ -143,6 +153,7 @@ export default function ConfiguracionPage() {
                   key={p.codigo}
                   codigo={p.codigo}
                   nombre={p.nombre}
+                  urlClave={p.urlClave}
                   estado={estados.find((e) => e.proveedor === p.codigo)}
                   onGuardado={cargar}
                   onEliminado={cargar}
@@ -152,6 +163,12 @@ export default function ConfiguracionPage() {
           )}
         </Card>
       </section>
+
+      <NoteBox variant="sky">
+        <strong>Cómo conseguir una clave:</strong> entra al enlace de tu proveedor preferido, inicia sesión, crea una
+        clave nueva, cópiala y pégala en su tarjeta. La clave solo se muestra una vez al crearla, así que cópiala
+        antes de cerrar la página.
+      </NoteBox>
 
       <NoteBox>
         Con configurar <strong>una</strong> de las claves alcanza. Si guardas varias, el sistema usa primero
