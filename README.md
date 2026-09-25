@@ -6,7 +6,7 @@ Aplicacion web para que un emprendedor registre los datos de su negocio y reciba
 
 - **frontend**: React, Vite y Tailwind, servido con nginx.
 - **backend**: Spring Boot, JWT y Flyway.
-- **ia-gateway**: FastAPI que llama a OpenAI o Gemini y guarda un cache semantico.
+- **ia-gateway**: FastAPI que llama a OpenAI, Gemini o DeepSeek y guarda un cache semantico.
 - **mysql**: base de datos.
 
 ## Como correrlo
@@ -28,7 +28,7 @@ El gateway de IA no expone puerto, solo lo usa el backend por la red interna de 
 
 1. Crea una cuenta en `/registro` e inicia sesion.
 2. Registra tu negocio, ofertas, competidores y branding.
-3. En Configuracion pega tu clave de OpenAI o de Gemini.
-4. En Inteligencia genera el FODA y las metas SMART, y de ahi las iniciativas y el plan semanal.
+3. En Configuracion pega tu clave de OpenAI, Gemini o DeepSeek.
+4. En Inteligencia genera el FODA y las metas SMART, y de ahi las iniciativas y el plan semanal. La IA genera y tu editas o dejas tal cual.
 
 Las claves de IA se guardan cifradas en la base de datos.

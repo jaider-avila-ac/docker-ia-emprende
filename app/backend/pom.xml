@@ -6,8 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.1.1</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+		<relativePath/>	</parent>
 	<groupId>com.iaemprender</groupId>
 	<artifactId>backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -50,13 +49,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
-		<!-- jackson-databind ya viaja en el classpath en tiempo de ejecución
-		     (lo trae spring-webmvc), pero solo transitivamente vía
-		     jjwt-jackson, que está en scope "runtime" — por eso no estaba
-		     disponible al compilar IaGatewayClienteImpl, que necesita
-		     ObjectMapper/JavaTimeModule directamente. Se declara explícita
-		     en scope normal para que SÍ esté en el classpath de compilación;
-		     la versión la sigue fijando el BOM de spring-boot-starter-parent. -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.datatype</groupId>
 			<artifactId>jackson-datatype-jsr310</artifactId>
@@ -72,8 +64,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- JWT: Spring Security no trae un generador/validador de tokens
-		     propio, así que se usa esta librería (independiente de Spring). -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>

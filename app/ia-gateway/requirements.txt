@@ -2,12 +2,4 @@ fastapi
 uvicorn[standard]
 httpx
 pydantic
-
-# Modelo de embeddings local para el caché semántico (ver
-# servicios/embeddings.py): compara el contexto de un negocio con el de
-# la última generación exitosa para no volver a llamar a Gemini/OpenAI
-# si en el fondo no cambió nada. Corre 100% en este contenedor, en CPU,
-# sin llamar a ninguna API — no es lo mismo que "una IA que ayuda a
-# Gemini": es un modelo aparte, mucho más chico, que solo mide qué tan
-# parecidos son dos textos.
 sentence-transformers
