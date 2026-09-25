@@ -1,12 +1,13 @@
 package com.iaemprender.backend.inteligencia.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public record MetaSmartRequest(
-    @NotBlank String titulo,
+    @NotBlank @Size(max = 255) String titulo,
     String especifico,
-    String numeroMeta,
+    @Size(max = 255) String numeroMeta,
     LocalDate fechaLimite,
     String medicion,
     String pasos) {}
