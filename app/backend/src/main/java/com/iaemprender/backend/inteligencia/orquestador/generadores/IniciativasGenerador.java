@@ -65,9 +65,9 @@ public class IniciativasGenerador implements GeneradorIA<List<IniciativaContenid
     return propuestas.stream()
         .map(i -> {
           var solicitud = new IniciativaRequest(
-              recortar(i.titulo(), 255),
-              recortar(i.metaTipo(), 100),
-              recortar(i.pilar(), 100),
+              i.titulo().trim(),
+              i.metaTipo(),
+              i.pilar(),
               null,
               i.impacto(),
               i.confianza(),
@@ -78,13 +78,5 @@ public class IniciativasGenerador implements GeneradorIA<List<IniciativaContenid
           return IniciativaResponse.desde(iniciativaService.crearGenerada(usuarioId, solicitud, i.iaTip()));
         })
         .toList();
-  }
-
-  private String recortar(String texto, int maximo) {
-    if (texto == null) {
-      return null;
-    }
-    String limpio = texto.trim();
-    return limpio.length() <= maximo ? limpio : limpio.substring(0, maximo);
   }
 }

@@ -66,9 +66,9 @@ public class SmartGenerador implements GeneradorIA<List<MetaSmartContenido>, Lis
     List<MetaSmart> nuevas = metas.stream().map(m -> {
       MetaSmart meta = new MetaSmart();
       meta.setNegocioId(negocio.getId());
-      meta.setTitulo(recortar(m.titulo(), 255));
+      meta.setTitulo(m.titulo());
       meta.setEspecifico(m.especifico());
-      meta.setNumeroMeta(recortar(m.numeroMeta(), 255));
+      meta.setNumeroMeta(m.numeroMeta());
       meta.setFechaLimite(m.fechaLimite());
       meta.setMedicion(m.medicion());
       meta.setPasos(m.pasos());
@@ -80,13 +80,5 @@ public class SmartGenerador implements GeneradorIA<List<MetaSmartContenido>, Lis
 
     cacheContexto.guardar(negocio.getId(), tipo(), contexto.negocio());
     return guardadas;
-  }
-
-  private String recortar(String texto, int maximo) {
-    if (texto == null) {
-      return null;
-    }
-    String limpio = texto.trim();
-    return limpio.length() <= maximo ? limpio : limpio.substring(0, maximo);
   }
 }

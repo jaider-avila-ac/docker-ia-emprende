@@ -18,7 +18,10 @@ def construir_prompt_smart(contexto: ContextoNegocio) -> str:
         "constancia de publicación, una sobre cómo se presenta/lo encuentran (perfil, bio, "
         "ficha de Google, fotos), y una sobre cómo responde e interactúa con la gente. "
         "Cada meta debe ser concreta y alcanzable para un negocio pequeño, en español, sin "
-        "tecnicismos. 'dias_plazo' debe ser un número entero razonable entre 7 y 90.\n\n"
+        "tecnicismos. 'dias_plazo' debe ser un número entero razonable entre 7 y 90.\n"
+        "Cada texto debe ser una frase completa y concisa que quepa en su límite de caracteres (nunca la dejes "
+        "cortada): 'titulo' máximo 150, 'especifico' máximo 400, 'numero_meta' máximo 150, 'medicion' máximo 300 "
+        "y 'pasos' máximo 500.\n\n"
         "Responde ÚNICAMENTE con un JSON válido, sin texto antes ni después, exactamente "
         f"con esta forma:\n{_ESQUEMA_JSON}"
     )

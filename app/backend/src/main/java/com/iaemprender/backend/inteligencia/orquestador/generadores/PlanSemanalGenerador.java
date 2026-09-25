@@ -63,7 +63,7 @@ public class PlanSemanalGenerador implements GeneradorIA<List<AccionPlanContenid
   public PlanSemanalResponse guardar(
       Long usuarioId, Negocio negocio, ContextoIA contexto, List<AccionPlanContenido> acciones) {
     List<PlanAccionRequest> solicitudes = acciones.stream()
-        .map(a -> new PlanAccionRequest(a.diaSemana(), recortar(a.descripcion(), 255)))
+        .map(a -> new PlanAccionRequest(a.diaSemana(), a.descripcion().trim()))
         .toList();
     planService.reemplazarAccionesSemanaActual(usuarioId, solicitudes);
 
@@ -79,10 +79,5 @@ public class PlanSemanalGenerador implements GeneradorIA<List<AccionPlanContenid
     } catch (IllegalArgumentException | NullPointerException ex) {
       return false;
     }
-  }
-
-  private String recortar(String texto, int maximo) {
-    String limpio = texto.trim();
-    return limpio.length() <= maximo ? limpio : limpio.substring(0, maximo);
   }
 }

@@ -52,7 +52,9 @@ def construir_prompt_iniciativas(s: SolicitudAsistente, contexto) -> str:
         "SMART y repitan lo que funcionó según los aprendizajes (evita lo que salió mal). 'titulo' es una acción "
         "clara (ej. 'Video corto mostrando cómo preparan el producto'). 'descripcion' explica en una o dos "
         "frases qué hacer y por qué. 'impacto', 'confianza' y 'esfuerzo' son enteros de 1 a 5. "
-        "'ia_tip' es un consejo breve para ejecutarla mejor.\n\n"
+        "'ia_tip' es un consejo breve para ejecutarla mejor. Límites (frases completas, nunca cortadas): 'titulo' "
+        "máximo 120 caracteres, 'descripcion' máximo 400 e 'ia_tip' máximo 300. 'meta_tipo' debe ser exactamente "
+        "uno de los valores indicados y 'pilar' también.\n\n"
         + _SOLO_JSON
         + esquema
     )
@@ -77,7 +79,7 @@ def construir_prompt_plan(s: SolicitudAsistente, contexto) -> str:
         "frase corta (máximo 200 caracteres), y debe salir de las iniciativas priorizadas. Reparte el trabajo "
         "en varios días, sin saturar ninguno, respetando el tiempo disponible y las publicaciones/historias "
         "sugeridas. 'dia_semana' debe ser exactamente uno de: Lunes, Martes, Miércoles, Jueves, Viernes, "
-        "Sábado, Domingo.\n\n"
+        "Sábado, Domingo. Cada 'descripcion' debe ser una frase completa de máximo 200 caracteres.\n\n"
         + _SOLO_JSON
         + esquema
     )
@@ -94,9 +96,10 @@ def construir_prompt_analisis(s: SolicitudAsistente, contexto) -> str:
         + _lista("Resultados semanales registrados", s.resultados, "sin registrar")
         + _lista("Metas SMART", s.metas, "no generadas")
         + "\nAnaliza cómo le está yendo al negocio con su presencia digital a partir de las evaluaciones y los "
-        "resultados. 'resumen' son dos o tres frases con la lectura general. 'que_funciono' y 'que_cambiar' son "
-        "listas de 2 a 4 puntos concretos y accionables. 'siguiente_paso' es la única acción más importante "
-        "para la próxima semana.\n\n"
+        "resultados. 'resumen' son dos o tres frases con la lectura general (máximo 600 caracteres). 'que_funciono' y "
+        "'que_cambiar' son listas de 2 a 4 puntos concretos y accionables, cada uno una frase completa de máximo "
+        "250 caracteres. 'siguiente_paso' es la única acción más importante para la próxima semana (máximo 300 "
+        "caracteres).\n\n"
         + _SOLO_JSON
         + esquema
     )

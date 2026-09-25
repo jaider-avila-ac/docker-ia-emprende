@@ -1,9 +1,6 @@
 from datetime import date, timedelta
 
-from pydantic import ValidationError
-
 from app import config
-from app.excepciones import RespuestaInvalidaError
 from app.modelos.contexto import ContextoNegocio
 from app.modelos.respuestas import FodaRespuesta, MetaSmartContenido, SmartRespuesta, SmartRespuestaIA
 from app.prompts.foda import construir_prompt_foda
@@ -12,6 +9,7 @@ from app.proveedores.eco_proveedor import EcoProveedor
 from app.proveedores.gemini_proveedor import GeminiProveedor
 from app.proveedores.openai_proveedor import OpenAiProveedor
 from app.servicios.optimizador import contar_tokens, recortar_contexto
+from app.servicios.reparacion import obtener_validado
 
 _PROVEEDORES = {
     "openai": OpenAiProveedor(base_url=config.OPENAI_BASE_URL),
@@ -35,8 +33,7 @@ def generar_foda(proveedor: str, clave_api: str, contexto: ContextoNegocio) -> t
     prompt = construir_prompt_foda(contexto_recortado)
     tokens_prompt = contar_tokens(prompt)
 
-    datos = cliente.generar_json(prompt, clave_api)
-    foda = FodaRespuesta.model_validate(datos)
+    foda = obtener_validado(cliente, prompt, clave_api, FodaRespuesta)
     return foda, tokens_prompt
 
 def generar_smart(proveedor: str, clave_api: str, contexto: ContextoNegocio) -> tuple[SmartRespuesta, int]:
@@ -46,8 +43,7 @@ def generar_smart(proveedor: str, clave_api: str, contexto: ContextoNegocio) -> 
     prompt = construir_prompt_smart(contexto_recortado)
     tokens_prompt = contar_tokens(prompt)
 
-    datos = cliente.generar_json(prompt, clave_api)
-    smart_ia = SmartRespuestaIA.model_validate(datos)
+    smart_ia = obtener_validado(cliente, prompt, clave_api, SmartRespuestaIA)
 
     hoy = date.today()
     metas = [
@@ -68,8 +64,4 @@ def generar_con_prompt(solicitud, constructor_prompt, modelo_respuesta):
     cliente = _obtener_proveedor(solicitud.proveedor)
     contexto_recortado = recortar_contexto(solicitud.negocio)
     prompt = constructor_prompt(solicitud, contexto_recortado)
-    datos = cliente.generar_json(prompt, solicitud.clave_api)
-    try:
-        return modelo_respuesta.model_validate(datos)
-    except ValidationError as ex:
-        raise RespuestaInvalidaError(f"La IA devolvio un formato inesperado: {ex.error_count()} errores") from ex
+    return obtener_validado(cliente, prompt, solicitud.clave_api, modelo_respuesta)
