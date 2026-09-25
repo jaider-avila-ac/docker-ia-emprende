@@ -21,15 +21,22 @@ public class SelectorProveedorIa {
   }
 
   public <T> T ejecutarConRespaldo(Long usuarioId, BiFunction<String, String, T> llamada) {
+    boolean claveRechazada = false;
     for (String proveedor : proveedoresDisponibles(usuarioId)) {
       String clave = apiKeyService.obtenerClaveDescifrada(usuarioId, proveedor);
       try {
         return llamada.apply(proveedor, clave);
-      } catch (IaGatewayClaveRechazadaException | IaGatewayNoDisponibleException ex) {
+      } catch (IaGatewayClaveRechazadaException ex) {
+        claveRechazada = true;
+      } catch (IaGatewayNoDisponibleException ex) {
       }
     }
+    if (claveRechazada) {
+      throw new SolicitudInvalidaException(
+          "No se pudo generar esto con ninguna de tus claves de IA configuradas. Revisa que sigan siendo válidas.");
+    }
     throw new SolicitudInvalidaException(
-        "No se pudo generar esto con ninguna de tus claves de IA configuradas. Revisa que sigan siendo válidas.");
+        "La IA está con mucha demanda o no respondió bien en este momento. Inténtalo de nuevo en unos segundos.");
   }
 
   public List<String> proveedoresDisponibles(Long usuarioId) {

@@ -8,6 +8,7 @@ from app.excepciones import (
     RespuestaInvalidaError,
 )
 from app.proveedores.base import ProveedorIA
+from app.proveedores.http_reintentos import post_con_reintentos
 
 class OpenAiProveedor(ProveedorIA):
     def __init__(self, base_url: str, modelo: str = "gpt-4o-mini", ruta: str = "/v1/chat/completions", nombre: str = "OpenAI"):
@@ -18,15 +19,14 @@ class OpenAiProveedor(ProveedorIA):
 
     def generar_json(self, prompt: str, clave_api: str) -> dict:
         try:
-            respuesta = httpx.post(
+            respuesta = post_con_reintentos(
                 f"{self.base_url}{self.ruta}",
-                headers={"Authorization": f"Bearer {clave_api}"},
-                json={
+                {"Authorization": f"Bearer {clave_api}"},
+                {
                     "model": self.modelo,
                     "messages": [{"role": "user", "content": prompt}],
                     "response_format": {"type": "json_object"},
                 },
-                timeout=60.0,
             )
         except httpx.RequestError as ex:
             raise ProveedorNoDisponibleError(f"No se pudo contactar a {self.nombre}: {ex}") from ex

@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -9,6 +11,8 @@ from app.excepciones import (
 from app.modelos.contexto import ContextoNegocio
 from app.modelos.respuestas import SmartRespuesta
 from app.servicios.orquestador import generar_smart
+
+registro = logging.getLogger("uvicorn.error")
 
 router = APIRouter(prefix="/smart", tags=["smart"])
 
@@ -30,6 +34,7 @@ def generar(solicitud: SolicitudGenerarSmart) -> RespuestaGenerarSmart:
     except ProveedorRechazoClaveError as ex:
         raise HTTPException(status_code=422, detail=str(ex)) from ex
     except (ProveedorNoDisponibleError, RespuestaInvalidaError) as ex:
+        registro.warning("Proveedor %s no disponible: %s", solicitud.proveedor, str(ex)[:300])
         raise HTTPException(status_code=502, detail=str(ex)) from ex
 
     return RespuestaGenerarSmart(smart=smart, tokens_prompt=tokens)

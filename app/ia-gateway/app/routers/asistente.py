@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, HTTPException
 
 from app.excepciones import (
@@ -18,6 +20,8 @@ from app.prompts.asistente import (
 )
 from app.servicios.orquestador import generar_con_prompt
 
+registro = logging.getLogger("uvicorn.error")
+
 router = APIRouter(prefix="/asistente", tags=["asistente"])
 
 
@@ -29,6 +33,7 @@ def _ejecutar(solicitud: SolicitudAsistente, constructor, modelo):
     except ProveedorRechazoClaveError as ex:
         raise HTTPException(status_code=422, detail=str(ex)) from ex
     except (ProveedorNoDisponibleError, RespuestaInvalidaError) as ex:
+        registro.warning("Proveedor %s no disponible: %s", solicitud.proveedor, str(ex)[:300])
         raise HTTPException(status_code=502, detail=str(ex)) from ex
 
 

@@ -8,6 +8,7 @@ from app.excepciones import (
     RespuestaInvalidaError,
 )
 from app.proveedores.base import ProveedorIA
+from app.proveedores.http_reintentos import post_con_reintentos
 
 class GeminiProveedor(ProveedorIA):
     def __init__(self, base_url: str, modelo: str = "gemini-3.5-flash"):
@@ -16,14 +17,13 @@ class GeminiProveedor(ProveedorIA):
 
     def generar_json(self, prompt: str, clave_api: str) -> dict:
         try:
-            respuesta = httpx.post(
+            respuesta = post_con_reintentos(
                 f"{self.base_url}/v1beta/models/{self.modelo}:generateContent",
-                headers={"x-goog-api-key": clave_api},
-                json={
+                {"x-goog-api-key": clave_api},
+                {
                     "contents": [{"parts": [{"text": prompt}]}],
                     "generationConfig": {"response_mime_type": "application/json"},
                 },
-                timeout=60.0,
             )
         except httpx.RequestError as ex:
             raise ProveedorNoDisponibleError(f"No se pudo contactar a Gemini: {ex}") from ex
