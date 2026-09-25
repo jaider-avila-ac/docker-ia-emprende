@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from './Sidebar'
+import AvisoClaveIa from './AvisoClaveIa'
 
 export default function MainLayout() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -44,6 +45,7 @@ export default function MainLayout() {
       </div>
 
       <main className="p-4 sm:p-6 space-y-6 min-w-0">
+        <AvisoClaveIa />
         <Outlet />
       </main>
     </div>

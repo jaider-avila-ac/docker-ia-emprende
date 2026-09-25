@@ -13,6 +13,9 @@ from app.servicios.optimizador import contar_tokens, recortar_contexto
 _PROVEEDORES = {
     "openai": OpenAiProveedor(base_url=config.OPENAI_BASE_URL),
     "gemini": GeminiProveedor(base_url=config.GEMINI_BASE_URL),
+    "deepseek": OpenAiProveedor(
+        base_url=config.DEEPSEEK_BASE_URL, modelo="deepseek-chat", ruta="/chat/completions", nombre="DeepSeek"
+    ),
     "eco": EcoProveedor(),
 }
 

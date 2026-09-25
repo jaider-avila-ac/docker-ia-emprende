@@ -10,14 +10,16 @@ from app.excepciones import (
 from app.proveedores.base import ProveedorIA
 
 class OpenAiProveedor(ProveedorIA):
-    def __init__(self, base_url: str, modelo: str = "gpt-4o-mini"):
+    def __init__(self, base_url: str, modelo: str = "gpt-4o-mini", ruta: str = "/v1/chat/completions", nombre: str = "OpenAI"):
         self.base_url = base_url
         self.modelo = modelo
+        self.ruta = ruta
+        self.nombre = nombre
 
     def generar_json(self, prompt: str, clave_api: str) -> dict:
         try:
             respuesta = httpx.post(
-                f"{self.base_url}/v1/chat/completions",
+                f"{self.base_url}{self.ruta}",
                 headers={"Authorization": f"Bearer {clave_api}"},
                 json={
                     "model": self.modelo,
@@ -27,18 +29,18 @@ class OpenAiProveedor(ProveedorIA):
                 timeout=60.0,
             )
         except httpx.RequestError as ex:
-            raise ProveedorNoDisponibleError(f"No se pudo contactar a OpenAI: {ex}") from ex
+            raise ProveedorNoDisponibleError(f"No se pudo contactar a {self.nombre}: {ex}") from ex
 
         texto_crudo = respuesta.content.decode("utf-8")
 
         if respuesta.status_code == 401:
-            raise ProveedorRechazoClaveError("OpenAI rechazó la clave.")
+            raise ProveedorRechazoClaveError(f"{self.nombre} rechazó la clave.")
         if respuesta.status_code >= 400:
-            raise ProveedorNoDisponibleError(f"OpenAI respondió {respuesta.status_code}: {texto_crudo[:300]}")
+            raise ProveedorNoDisponibleError(f"{self.nombre} respondió {respuesta.status_code}: {texto_crudo[:300]}")
 
         try:
             cuerpo = json.loads(texto_crudo)
             contenido = cuerpo["choices"][0]["message"]["content"]
             return json.loads(contenido)
         except (KeyError, IndexError, json.JSONDecodeError) as ex:
-            raise RespuestaInvalidaError(f"Respuesta de OpenAI con formato inesperado: {ex}") from ex
+            raise RespuestaInvalidaError(f"Respuesta de {self.nombre} con formato inesperado: {ex}") from ex

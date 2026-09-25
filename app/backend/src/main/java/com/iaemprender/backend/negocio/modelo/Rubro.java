@@ -5,6 +5,15 @@ public enum Rubro {
   PELUQUERIA_ESTETICA("Peluquería / estética"),
   CONSULTORIO_SERVICIO_PROFESIONAL("Consultorio / servicio profesional"),
   TIENDA_FISICA("Tienda física"),
+  SOFTWARE_SAAS("Software como servicio (SaaS)"),
+  APP_MOVIL_SOFTWARE("Aplicación móvil / software a medida"),
+  AGENCIA_DIGITAL("Agencia digital / marketing"),
+  ECOMMERCE("Tienda en línea / e-commerce"),
+  EDUCACION_CURSOS("Educación / cursos en línea"),
+  CONSULTOR_FREELANCER("Consultor / freelancer independiente"),
+  SALUD_BIENESTAR("Salud y bienestar / gimnasio"),
+  TURISMO_HOSPEDAJE("Turismo / hospedaje"),
+  FOTOGRAFIA_AUDIOVISUAL("Fotografía / producción audiovisual"),
   OTRO("Otro");
 
   private final String valorDb;

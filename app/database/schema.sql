@@ -17,7 +17,7 @@ CREATE TABLE negocios (
   id                      BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   usuario_id              BIGINT UNSIGNED NOT NULL,
   nombre                  VARCHAR(150) NOT NULL,
-  rubro                   ENUM('Restaurante','Peluquería / estética','Consultorio / servicio profesional','Tienda física','Otro') NOT NULL DEFAULT 'Otro',
+  rubro                   ENUM('Restaurante','Peluquería / estética','Consultorio / servicio profesional','Tienda física','Software como servicio (SaaS)','Aplicación móvil / software a medida','Agencia digital / marketing','Tienda en línea / e-commerce','Educación / cursos en línea','Consultor / freelancer independiente','Salud y bienestar / gimnasio','Turismo / hospedaje','Fotografía / producción audiovisual','Otro') NOT NULL DEFAULT 'Otro',
   ubicacion               VARCHAR(255) NULL,
   vende_en_linea          BOOLEAN NOT NULL DEFAULT FALSE,
   cobertura_envio         VARCHAR(255) NULL,
@@ -223,7 +223,8 @@ CREATE TABLE proveedores_ia (
 
 INSERT INTO proveedores_ia (codigo, nombre) VALUES
   ('openai', 'OpenAI'),
-  ('gemini', 'Google Gemini');
+  ('gemini', 'Google Gemini'),
+  ('deepseek', 'DeepSeek');
 
 CREATE TABLE usuario_api_keys (
   id                      BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

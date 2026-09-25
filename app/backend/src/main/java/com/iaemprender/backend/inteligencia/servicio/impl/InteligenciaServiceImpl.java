@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InteligenciaServiceImpl implements InteligenciaService {
-  private static final List<String> ORDEN_PROVEEDORES = List.of("openai", "gemini");
+  private static final List<String> ORDEN_PROVEEDORES = List.of("openai", "gemini", "deepseek");
 
   private static final String TIPO_FODA = "foda";
   private static final String TIPO_SMART = "smart";
@@ -233,7 +233,7 @@ public class InteligenciaServiceImpl implements InteligenciaService {
 
     if (proveedores.isEmpty()) {
       throw new SolicitudInvalidaException(
-          "Configura al menos una clave de IA (OpenAI o Gemini) en Configuración antes de generar esto.");
+          "Configura al menos una clave de IA (OpenAI, Gemini o DeepSeek) en Configuración antes de generar esto.");
     }
     return proveedores;
   }

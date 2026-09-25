@@ -11,6 +11,7 @@ import { ApiError } from '../../api/client'
 const PROVEEDORES = [
   { codigo: 'openai', nombre: 'OpenAI' },
   { codigo: 'gemini', nombre: 'Google Gemini' },
+  { codigo: 'deepseek', nombre: 'DeepSeek' },
 ]
 
 function TarjetaProveedor({ codigo, nombre, estado, onGuardado, onEliminado }) {
@@ -127,7 +128,7 @@ export default function ConfiguracionPage() {
         </Card>
 
         <Card className="bg-gray-50">
-          <h2 className="text-base font-semibold text-indigo-900">Claves de IA (OpenAI / Gemini)</h2>
+          <h2 className="text-base font-semibold text-indigo-900">Claves de IA (OpenAI / Gemini / DeepSeek)</h2>
           <p className="text-xs text-gray-500 mt-1">
             Necesarias para generar FODA y metas SMART. Se guardan cifradas — nunca se pueden volver a leer, solo
             reemplazar.
@@ -153,8 +154,8 @@ export default function ConfiguracionPage() {
       </section>
 
       <NoteBox>
-        Con configurar <strong>una</strong> de las dos claves alcanza. Si guardas ambas, el sistema usa OpenAI
-        primero y cambia a Gemini automáticamente si la primera falla.
+        Con configurar <strong>una</strong> de las claves alcanza. Si guardas varias, el sistema usa primero
+        OpenAI, luego Gemini y luego DeepSeek, y pasa a la siguiente automáticamente si una falla.
       </NoteBox>
     </>
   )
